@@ -1,0 +1,95 @@
+{
+  "guests": [
+    {
+      "id": "gst-1794591459875",
+      "name": "Sisi Dian Yuriska",
+      "slug": "sisi-dian-yuriska",
+      "category": "Teman",
+      "phoneNumber": "08974436879",
+      "customNote": "",
+      "hasOpened": true,
+      "createdAt": "2026-11-13T17:37:39.875Z"
+    },
+    {
+      "id": "gst-1",
+      "name": "Bpk. Budi Santoso & Keluarga",
+      "slug": "budi-santoso",
+      "category": "Keluarga",
+      "phoneNumber": "081234567890",
+      "hasOpened": true,
+      "createdAt": "2026-11-13T15:31:39.124Z"
+    },
+    {
+      "id": "gst-2",
+      "name": "Siti Rahmawati, S.Kom",
+      "slug": "siti-rahmawati",
+      "category": "Sahabat",
+      "phoneNumber": "089876543210",
+      "hasOpened": true,
+      "createdAt": "2026-11-13T15:31:39.126Z"
+    },
+    {
+      "id": "gst-3",
+      "name": "Rizky Pratama",
+      "slug": "rizky-pratama",
+      "category": "Rekan Kerja",
+      "phoneNumber": "082112345678",
+      "hasOpened": false,
+      "createdAt": "2026-11-13T15:31:39.126Z"
+    }
+  ],
+  "rsvps": [
+    {
+      "id": "rsvp-1794591698698",
+      "guestName": "Asril Rinaldi",
+      "attendance": "hadir",
+      "guestCount": 1,
+      "message": "",
+      "createdAt": "2026-11-13T17:41:38.698Z"
+    },
+    {
+      "id": "rsvp-1",
+      "guestName": "Bpk. Budi Santoso & Keluarga",
+      "attendance": "hadir",
+      "guestCount": 3,
+      "message": "Insya Allah kami sekeluarga hadir mendoakan langsung kedua mempelai.",
+      "createdAt": "2026-11-12T15:31:39.126Z"
+    },
+    {
+      "id": "rsvp-2",
+      "guestName": "Siti Rahmawati, S.Kom",
+      "attendance": "hadir",
+      "guestCount": 1,
+      "message": "Selamat ya Sisi dan Asril! Pasti hadir!",
+      "createdAt": "2026-11-13T03:31:39.126Z"
+    }
+  ],
+  "wishes": [
+    {
+      "id": "wish-1794592971797",
+      "name": "testing",
+      "relationship": "Sahabat",
+      "message": "selamat ya",
+      "createdAt": "2026-11-13T18:02:51.797Z"
+    }
+  ],
+  "couple": {
+    "heroPhoto": "/foto-pasangan/DSC_0228-2.jpg",
+    "groom": {
+      "fullName": "Asril Rinaldi",
+      "nickname": "Asril",
+      "father": "Nowendri",
+      "mother": "Surastini",
+      "photo": "/foto-pasangan/foto-pria.jpg",
+      "instagram": "as.rinaldi"
+    },
+    "bride": {
+      "fullName": "Sisi Dian Yuriska",
+      "nickname": "Sisi",
+      "father": "Sistarudin",
+      "mother": "Dian",
+      "photo": "/foto-pasangan/foto-wanita.jpg",
+      "instagram": "seyy"
+    }
+  }
+}

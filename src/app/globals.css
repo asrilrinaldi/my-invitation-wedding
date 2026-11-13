@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+@font-face {
+  font-family: 'laisharegular';
+  src: url('/fonts/laisha-webfont.woff2') format('woff2'),
+       url('/fonts/laisha-webfont.woff') format('woff'),
+       url('/laisha-webfont.woff2') format('woff2'),
+       url('/laisha-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-cormorant: 'Cormorant Garamond', Georgia, serif;
+  --font-playfair: 'Playfair Display', Georgia, serif;
+  --font-alex-brush: 'Alex Brush', cursive;
+  --font-plus-jakarta: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: var(--font-plus-jakarta);
+}
+
+body {
+  background-color: #EDE8E1;
+  color: #2C2825;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Serein Aesthetic Cards */
+.serein-card {
+  background: #FFFFFF;
+  border: 1px solid #EBE5DC;
+  box-shadow: 0 4px 20px rgba(74, 69, 63, 0.05);
+}
+
+.serein-card-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.serein-card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(74, 69, 63, 0.09);
+  border-color: #D9D2C7;
+}
+
+/* Custom Scrollbar for Invitation Pane */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #EAE5DE;
+}
+::-webkit-scrollbar-thumb {
+  background: #B5ABA0;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8F8478;
+}
+
+/* Button Breathing Animation */
+@keyframes breatheScale {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+  }
+  50% {
+    transform: scale(1.07);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.38);
+  }
+}
+
+.animate-breathe {
+  animation: breatheScale 2.2s ease-in-out infinite;
+}
+
+/* Organic Floating Particles Animations */
+@keyframes floatDynamic1 {
+  0% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+  25% { transform: translate(15px, -25px) scale(1.2); opacity: 0.7; }
+  50% { transform: translate(-10px, -45px) scale(0.9); opacity: 0.4; }
+  75% { transform: translate(20px, -20px) scale(1.1); opacity: 0.8; }
+  100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+}
+
+@keyframes floatDynamic2 {
+  0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+  33% { transform: translate(-20px, 30px) scale(0.85); opacity: 0.75; }
+  66% { transform: translate(15px, 15px) scale(1.2); opacity: 0.5; }
+  100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+}
+
+@keyframes floatDynamic3 {
+  0% { transform: translate(0, 0) scale(1); opacity: 0.25; }
+  50% { transform: translate(-25px, -35px) scale(1.3); opacity: 0.85; }
+  100% { transform: translate(0, 0) scale(1); opacity: 0.25; }
+}
+
+@keyframes floatGlow {
+  0%, 100% { 
+    transform: translate(0, 0) scale(1); 
+    opacity: 0.45; 
+    filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.4)); 
+  }
+  50% { 
+    transform: translate(22px, -30px) scale(1.35); 
+    opacity: 0.95; 
+    filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.85)); 
+  }
+}
+
+.particle-1 { animation: floatDynamic1 7s ease-in-out infinite; }
+.particle-2 { animation: floatDynamic2 9s ease-in-out infinite; }
+.particle-3 { animation: floatDynamic3 11s ease-in-out infinite; }
+.particle-glow { animation: floatGlow 6.5s ease-in-out infinite; }
