@@ -1,0 +1,58 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Next.js build output & cache
+/.next/
+/out/
+build/
+dist/
+
+# TypeScript build info cache
+*.tsbuildinfo
+next-env.d.ts
+
+# Environment variables & secrets (jangan sampai ter-commit ke git)
+.env
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+*.log
+
+# Vercel deployment metadata
+.vercel
+
+# Operating System files (Windows & macOS)
+.DS_Store
+*.pem
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# IDE / Code Editor configurations
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Raw / Backup media folders di root (karena file aset web sudah tersimpan rapi di public/)
+/Foto Pasangan/
+/Music/
+
+# Temporary developer context & scratchpads
+context.md
