@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, ZoomIn } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { ZoomIn } from 'lucide-react';
 import ScrollReveal from './ScrollReveal';
 
 const galleryItems = [
@@ -15,6 +16,11 @@ const galleryItems = [
 
 export default function GallerySection() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const openImage = (src: string) => {
     setSelectedImage(src);
@@ -102,33 +108,33 @@ export default function GallerySection() {
         </div>
       </ScrollReveal>
 
-      {/* Lightbox Modal with Elevated z-index */}
-      {selectedImage && (
+      {/* Lightbox Modal with Full-Screen Portal (100% Layar Penuh Meliputi Seluruh Layar Desktop & Mobile) */}
+      {selectedImage && mounted && createPortal(
         <div 
           onClick={closeImage}
-          className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in"
+          className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-4 sm:p-8 animate-fade-in cursor-pointer select-none"
           role="dialog"
           aria-modal="true"
         >
-          <button 
-            type="button"
-            onClick={closeImage}
-            aria-label="Tutup Foto"
-            className="absolute top-6 right-6 p-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors cursor-pointer active:scale-95 shadow-md"
-          >
-            <X className="w-6 h-6" />
-          </button>
+          {/* Image Container with Safe Height */}
           <div 
-            className="relative max-w-lg max-h-[85vh] w-full flex items-center justify-center" 
-            onClick={(e) => e.stopPropagation()}
+            className="relative max-w-lg max-h-[75vh] sm:max-h-[78vh] w-full flex items-center justify-center"
           >
             <img
               src={selectedImage}
               alt="Preview Galeri"
-              className="max-w-full max-h-[85vh] rounded-2xl object-contain shadow-2xl select-none"
+              className="max-w-full max-h-[75vh] sm:max-h-[78vh] rounded-2xl object-contain shadow-2xl pointer-events-none"
             />
           </div>
-        </div>
+
+          {/* User Hint - Diberikan jarak yang lega dan tidak dempet dengan foto */}
+          <div className="pt-6 sm:pt-8 text-center pointer-events-none">
+            <p className="text-xs sm:text-sm text-white/75 font-sans tracking-widest font-normal drop-shadow-md">
+              Ketuk di mana saja untuk menutup
+            </p>
+          </div>
+        </div>,
+        document.body
       )}
     </section>
   );

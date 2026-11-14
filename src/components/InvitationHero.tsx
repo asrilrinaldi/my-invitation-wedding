@@ -70,11 +70,13 @@ export default function InvitationHero({
 
   const handleOpen = () => {
     try {
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
       confetti({
-        particleCount: 70,
-        spread: 65,
+        particleCount: isMobile ? 40 : 65,
+        spread: 60,
         origin: { y: 0.7 },
         colors: ['#D4AF37', '#FAF8F5', '#F8D7DA', '#ECC5CB', '#C5A880', '#F7E5DE'],
+        disableForReducedMotion: true,
       });
     } catch (e) {
       // ignore confetti errors
