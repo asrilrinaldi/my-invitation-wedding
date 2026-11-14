@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useMusic } from '@/lib/context/MusicContext';
 
 interface AudioPlayerProps {
   audioSrc?: string;
@@ -8,9 +9,12 @@ interface AudioPlayerProps {
 }
 
 export default function AudioPlayer({ 
-  audioSrc = '/music/music001.mp3', 
+  audioSrc, 
   autoPlayTrigger = false 
 }: AudioPlayerProps) {
+  const { music } = useMusic();
+  const activeAudioSrc = audioSrc || music?.url || '/music/music001.mp3';
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [isPhotoOpen, setIsPhotoOpen] = useState(false);
@@ -44,6 +48,14 @@ export default function AudioPlayer({
     }
   }, [autoPlayTrigger, hasInteracted]);
 
+  // When active music URL changes dynamically
+  useEffect(() => {
+    if (audioRef.current && isPlaying) {
+      audioRef.current.load();
+      audioRef.current.play().catch(() => {});
+    }
+  }, [activeAudioSrc]);
+
   const togglePlay = () => {
     if (!audioRef.current) return;
     if (isPlaying) {
@@ -61,14 +73,14 @@ export default function AudioPlayer({
 
   // Only show after user has clicked "Buka Undangan" or audio triggered
   if (!autoPlayTrigger && !hasInteracted) {
-    return <audio ref={audioRef} src={audioSrc} loop preload="auto" />;
+    return <audio ref={audioRef} src={activeAudioSrc} loop preload="auto" />;
   }
 
   return (
     <>
       <audio 
         ref={audioRef} 
-        src={audioSrc} 
+        src={activeAudioSrc} 
         loop 
         preload="auto"
       />
@@ -83,7 +95,7 @@ export default function AudioPlayer({
           disabled={isPhotoOpen}
           aria-label={isPlaying ? 'Jeda Musik' : 'Putar Musik'}
           className="group relative flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/85 hover:bg-white backdrop-blur-md shadow-xl border border-white/60 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer p-1.5"
-          title={isPlaying ? 'Jeda Musik (Klik untuk berhenti)' : 'Putar Musik (Klik untuk memutar)'}
+          title={isPlaying ? `Jeda Musik (${music?.title || 'Romantic Wedding Melody'})` : `Putar Musik (${music?.title || 'Romantic Wedding Melody'})`}
         >
           <img
             src={isPlaying ? '/icon/play-music.png' : '/icon/pause-music.png'}

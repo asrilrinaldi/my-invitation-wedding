@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { CoupleProvider } from "@/lib/context/CoupleContext";
+import { MusicProvider } from "@/lib/context/MusicContext";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -36,7 +37,9 @@ export default function RootLayout({
     <html lang="id">
       <body className="antialiased selection:bg-[#B5AAA0] selection:text-black bg-[#EDE8E1]">
         <CoupleProvider>
-          {children}
+          <MusicProvider>
+            {children}
+          </MusicProvider>
         </CoupleProvider>
       </body>
     </html>

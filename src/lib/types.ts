@@ -67,3 +67,10 @@ export interface WeddingData {
     title: string;
   };
 }
+
+export interface MusicTrackOption {
+  id: string;
+  name: string;
+  title: string;
+  url: string;
+}

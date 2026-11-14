@@ -8,6 +8,7 @@ interface DatabaseSchema {
   rsvps: RSVP[];
   wishes: Wish[];
   couple?: WeddingData['couple'];
+  music?: WeddingData['music'];
 }
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -306,4 +307,63 @@ export function saveCouple(coupleData: WeddingData['couple']): WeddingData['coup
   };
   writeData(data);
   return data.couple;
+}
+
+// MUSIC OPERATIONS
+export function getMusic(): WeddingData['music'] {
+  const data = readData();
+  if (data.music && data.music.url) {
+    return data.music;
+  }
+  return weddingConfig.music;
+}
+
+export function saveMusic(musicData: WeddingData['music']): WeddingData['music'] {
+  const data = readData();
+  data.music = {
+    url: musicData.url || weddingConfig.music.url,
+    title: musicData.title || weddingConfig.music.title,
+  };
+  writeData(data);
+  return data.music;
+}
+
+export function getAvailableMusicTracks(): { id: string; name: string; title: string; url: string }[] {
+  const musicDir = path.join(process.cwd(), 'public', 'music');
+  const tracks: { id: string; name: string; title: string; url: string }[] = [];
+
+  const knownTitles: Record<string, string> = {
+    'music001.mp3': 'Romantic Wedding Melody 01 (Soft Acoustic & Piano)',
+    'music002.mp3': 'Romantic Wedding Melody 02 (Classic Wedding Instrumental)',
+  };
+
+  try {
+    if (fs.existsSync(musicDir)) {
+      const files = fs.readdirSync(musicDir);
+      for (const file of files) {
+        if (/\.(mp3|wav|ogg|m4a)$/i.test(file)) {
+          const id = path.parse(file).name;
+          const title = knownTitles[file] || `Lagu Pernikahan - ${id.toUpperCase()}`;
+          tracks.push({
+            id,
+            name: file,
+            title,
+            url: `/music/${file}`,
+          });
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Error reading music dir:', err);
+  }
+
+  // Fallback if directory read failed
+  if (tracks.length === 0) {
+    tracks.push(
+      { id: 'music001', name: 'music001.mp3', title: 'Romantic Wedding Melody 01', url: '/music/music001.mp3' },
+      { id: 'music002', name: 'music002.mp3', title: 'Romantic Wedding Melody 02', url: '/music/music002.mp3' }
+    );
+  }
+
+  return tracks;
 }

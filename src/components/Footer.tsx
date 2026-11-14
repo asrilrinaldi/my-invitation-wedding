@@ -41,7 +41,7 @@ export default function Footer() {
 
       <ScrollReveal animation="fade" delay={320} duration={800}>
         <div className="pt-8 flex flex-col items-center justify-between max-w-md mx-auto text-[10px] text-[#8C847B] border-t border-[#DDD6CC] gap-2">
-          <p>&copy; Asril Rinaldi</p>
+          <p>&copy; 2026 Asril Rinaldi</p>
           <Link
             href="/admin"
             className="inline-flex items-center gap-1 text-[#8C7B6B] hover:text-[#38332E] transition-colors"

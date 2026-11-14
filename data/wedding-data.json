@@ -34,7 +34,7 @@
       "slug": "rizky-pratama",
       "category": "Rekan Kerja",
       "phoneNumber": "082112345678",
-      "hasOpened": false,
+      "hasOpened": true,
       "createdAt": "2026-11-13T15:31:39.126Z"
     }
   ],
@@ -78,18 +78,22 @@
     "groom": {
       "fullName": "Asril Rinaldi",
       "nickname": "Asril",
-      "father": "Nowendri",
-      "mother": "Surastini",
+      "father": "Bapak Nowendri",
+      "mother": "Ibu Surastini",
       "photo": "/foto-pasangan/foto-pria.jpg",
-      "instagram": "as.rinaldi"
+      "instagram": "as.rinald"
     },
     "bride": {
       "fullName": "Sisi Dian Yuriska",
       "nickname": "Sisi",
-      "father": "Sistarudin",
-      "mother": "Dian",
+      "father": "Bapak Sistarudin",
+      "mother": "Ibu ",
       "photo": "/foto-pasangan/foto-wanita.jpg",
       "instagram": "seyy"
     }
+  },
+  "music": {
+    "url": "/music/music002.mp3",
+    "title": "Romantic Wedding Melody 02 (Classic Wedding Instrumental)"
   }
 }

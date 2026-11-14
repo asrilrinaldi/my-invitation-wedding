@@ -71,10 +71,10 @@ export default function InvitationHero({
   const handleOpen = () => {
     try {
       confetti({
-        particleCount: 60,
-        spread: 60,
+        particleCount: 70,
+        spread: 65,
         origin: { y: 0.7 },
-        colors: ['#D4AF37', '#FAF8F5', '#8C7D6F', '#C5A880'],
+        colors: ['#D4AF37', '#FAF8F5', '#F8D7DA', '#ECC5CB', '#C5A880', '#F7E5DE'],
       });
     } catch (e) {
       // ignore confetti errors

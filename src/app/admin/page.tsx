@@ -1,19 +1,19 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { 
   Users, CheckCircle, XCircle, MessageSquare, Plus, Trash2, 
   Copy, Check, ExternalLink, Share2, ArrowLeft, RefreshCw, Eye,
-  Heart, Save, Sparkles, User, ShieldCheck
+  Heart, Save, Sparkles, User, ShieldCheck, Music, Play, Pause, Volume2
 } from 'lucide-react';
-import { Guest, RSVP, Wish, WeddingData } from '@/lib/types';
+import { Guest, RSVP, Wish, WeddingData, MusicTrackOption } from '@/lib/types';
 import { weddingConfig } from '@/lib/data';
 
 type CoupleConfig = WeddingData['couple'];
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<'guests' | 'couple' | 'rsvp' | 'wishes'>('guests');
+  const [activeTab, setActiveTab] = useState<'guests' | 'couple' | 'music' | 'rsvp' | 'wishes'>('guests');
   const [guests, setGuests] = useState<Guest[]>([]);
   const [rsvps, setRsvps] = useState<RSVP[]>([]);
   const [wishes, setWishes] = useState<Wish[]>([]);
@@ -36,6 +36,21 @@ export default function AdminPage() {
   const [coupleSuccessMessage, setCoupleSuccessMessage] = useState('');
   const [coupleErrorMessage, setCoupleErrorMessage] = useState('');
 
+  // Music Config State
+  const [musicForm, setMusicForm] = useState({
+    url: weddingConfig.music.url,
+    title: weddingConfig.music.title,
+  });
+  const [musicOptions, setMusicOptions] = useState<MusicTrackOption[]>([
+    { id: 'music001', name: 'music001.mp3', title: 'Romantic Wedding Melody 01 (Soft Acoustic & Piano)', url: '/music/music001.mp3' },
+    { id: 'music002', name: 'music002.mp3', title: 'Romantic Wedding Melody 02 (Classic Wedding Instrumental)', url: '/music/music002.mp3' },
+  ]);
+  const [isSavingMusic, setIsSavingMusic] = useState(false);
+  const [musicSuccessMessage, setMusicSuccessMessage] = useState('');
+  const [musicErrorMessage, setMusicErrorMessage] = useState('');
+  const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
+  const audioPreviewRef = useRef<HTMLAudioElement | null>(null);
+
   // New Guest Form State
   const [newGuestName, setNewGuestName] = useState('');
   const [newGuestCategory, setNewGuestCategory] = useState<'Keluarga' | 'Teman' | 'Sahabat' | 'VIP' | 'Rekan Kerja' | 'Umum'>('Teman');
@@ -45,20 +60,22 @@ export default function AdminPage() {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const [guestsRes, rsvpsRes, wishesRes, statsRes, coupleRes] = await Promise.all([
+      const [guestsRes, rsvpsRes, wishesRes, statsRes, coupleRes, musicRes] = await Promise.all([
         fetch('/api/guests', { cache: 'no-store' }),
         fetch('/api/rsvp', { cache: 'no-store' }),
         fetch('/api/wishes', { cache: 'no-store' }),
         fetch('/api/stats', { cache: 'no-store' }),
         fetch('/api/config/couple', { cache: 'no-store' }),
+        fetch('/api/config/music', { cache: 'no-store' }),
       ]);
 
-      const [guestsData, rsvpsData, wishesData, statsData, coupleData] = await Promise.all([
+      const [guestsData, rsvpsData, wishesData, statsData, coupleData, musicData] = await Promise.all([
         guestsRes.json(),
         rsvpsRes.json(),
         wishesRes.json(),
         statsRes.json(),
         coupleRes.json(),
+        musicRes.json(),
       ]);
 
       if (guestsData.success) setGuests(guestsData.data);
@@ -66,6 +83,10 @@ export default function AdminPage() {
       if (wishesData.success) setWishes(wishesData.data);
       if (statsData.success) setStats(statsData.data);
       if (coupleData.success && coupleData.data) setCoupleForm(coupleData.data);
+      if (musicData.success && musicData.data) {
+        setMusicForm(musicData.data);
+        if (musicData.options) setMusicOptions(musicData.options);
+      }
     } catch (err) {
       console.error('Error fetching admin data:', err);
     } finally {
@@ -98,6 +119,60 @@ export default function AdminPage() {
       setCoupleErrorMessage('Terjadi kesalahan jaringan.');
     } finally {
       setIsSavingCouple(false);
+    }
+  };
+
+  const handleSaveMusic = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingMusic(true);
+    setMusicSuccessMessage('');
+    setMusicErrorMessage('');
+
+    try {
+      const res = await fetch('/api/config/music', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(musicForm),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setMusicSuccessMessage('Musik latar berhasil diperbarui!');
+        setTimeout(() => setMusicSuccessMessage(''), 4500);
+        fetchData();
+      } else {
+        setMusicErrorMessage(data.message || 'Gagal menyimpan musik.');
+      }
+    } catch (err) {
+      setMusicErrorMessage('Terjadi kesalahan jaringan.');
+    } finally {
+      setIsSavingMusic(false);
+    }
+  };
+
+  const handleMusicSelect = (selectedUrl: string) => {
+    const selectedTrack = musicOptions.find(t => t.url === selectedUrl);
+    setMusicForm({
+      url: selectedUrl,
+      title: selectedTrack ? selectedTrack.title : musicForm.title,
+    });
+
+    if (audioPreviewRef.current) {
+      audioPreviewRef.current.pause();
+      setIsPreviewPlaying(false);
+    }
+  };
+
+  const toggleAudioPreview = () => {
+    if (!audioPreviewRef.current) return;
+    if (isPreviewPlaying) {
+      audioPreviewRef.current.pause();
+      setIsPreviewPlaying(false);
+    } else {
+      audioPreviewRef.current.src = musicForm.url;
+      audioPreviewRef.current.play()
+        .then(() => setIsPreviewPlaying(true))
+        .catch((err) => console.error('Audio play error:', err));
     }
   };
 
@@ -314,6 +389,17 @@ Hormat kami yang berbahagia,
           >
             <Heart className="w-3.5 h-3.5 text-rose-400" />
             <span>Data Pengantin &amp; Orang Tua</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('music')}
+            className={`pb-3 px-4 text-xs font-semibold tracking-wider uppercase transition-colors border-b-2 flex items-center gap-2 shrink-0 ${
+              activeTab === 'music'
+                ? 'border-gold-400 text-gold-300'
+                : 'border-transparent text-gray-400 hover:text-gray-200'
+            }`}
+          >
+            <Music className="w-3.5 h-3.5 text-amber-400" />
+            <span>Musik Latar</span>
           </button>
           <button
             onClick={() => setActiveTab('rsvp')}
@@ -738,6 +824,158 @@ Hormat kami yang berbahagia,
               >
                 <Save className="w-4 h-4" />
                 <span>{isSavingCouple ? 'Menyimpan Perubahan...' : 'Simpan Data Pengantin & Orang Tua'}</span>
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* TAB: MUSIC CONFIG */}
+        {activeTab === 'music' && (
+          <form onSubmit={handleSaveMusic} className="glass-card rounded-2xl p-6 sm:p-8 space-y-6 border border-gold-500/20">
+            {/* Header info */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-gold-300 font-semibold text-base sm:text-lg">
+                  <Music className="w-5 h-5 text-amber-400" />
+                  <span>Pengaturan Musik Latar Undangan</span>
+                </div>
+                <p className="text-xs text-gray-400">
+                  Pilih musik romantis yang akan diputar otomatis saat tamu membuka undangan pernikahan.
+                </p>
+              </div>
+
+              {/* Status Musik Aktif */}
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 text-xs shrink-0">
+                <Volume2 className="w-3.5 h-3.5" />
+                <span>Musik Aktif: <strong className="font-semibold text-white">{musicForm.title || musicForm.url}</strong></span>
+              </div>
+            </div>
+
+            {/* Notification messages */}
+            {musicSuccessMessage && (
+              <div className="p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2 animate-fade-in">
+                <CheckCircle className="w-4 h-4 shrink-0" />
+                <span>{musicSuccessMessage}</span>
+              </div>
+            )}
+            {musicErrorMessage && (
+              <div className="p-3.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 text-xs flex items-center gap-2 animate-fade-in">
+                <XCircle className="w-4 h-4 shrink-0" />
+                <span>{musicErrorMessage}</span>
+              </div>
+            )}
+
+            {/* Hidden HTML5 Audio Element for live preview */}
+            <audio 
+              ref={audioPreviewRef} 
+              onEnded={() => setIsPreviewPlaying(false)}
+              onError={() => setIsPreviewPlaying(false)}
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Dropdown Pemilihan Lagu */}
+              <div className="space-y-2">
+                <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider">
+                  Pilih Lagu dari Dropdown
+                </label>
+                <div className="relative">
+                  <select
+                    value={musicForm.url}
+                    onChange={(e) => handleMusicSelect(e.target.value)}
+                    className="w-full bg-black/60 border border-white/20 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-gold-400 transition-colors cursor-pointer appearance-none"
+                  >
+                    {musicOptions.map((opt) => (
+                      <option key={opt.id} value={opt.url} className="bg-neutral-900 text-white">
+                        🎵 {opt.title} ({opt.name})
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 text-xs">
+                    ▼
+                  </div>
+                </div>
+                <p className="text-[11px] text-gray-500">
+                  Daftar lagu dideteksi otomatis dari folder <code className="text-gold-300">public/music/</code>.
+                </p>
+              </div>
+
+              {/* Judul Tampilan Lagu */}
+              <div className="space-y-2">
+                <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider">
+                  Judul Tampilan Lagu
+                </label>
+                <input
+                  type="text"
+                  value={musicForm.title}
+                  onChange={(e) => setMusicForm({ ...musicForm, title: e.target.value })}
+                  placeholder="Contoh: Romantic Wedding Melody"
+                  className="w-full bg-black/60 border border-white/20 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-gold-400 transition-colors"
+                />
+                <p className="text-[11px] text-gray-500">
+                  Judul ini akan ditampilkan saat tombol musik di-hover oleh tamu.
+                </p>
+              </div>
+            </div>
+
+            {/* Cuplikan Musik / Audio Preview Player Card */}
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gold-500/20 text-gold-300 border border-gold-500/30 flex items-center justify-center shrink-0">
+                  <Music className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-white">
+                    {musicForm.title || 'Lagu Terpilih'}
+                  </p>
+                  <p className="text-[11px] text-gray-400 font-mono">
+                    File: {musicForm.url}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={toggleAudioPreview}
+                className={`px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all flex items-center gap-2 cursor-pointer shadow-md ${
+                  isPreviewPlaying
+                    ? 'bg-amber-500 text-black hover:bg-amber-400'
+                    : 'bg-white/15 hover:bg-white/25 text-white border border-white/20'
+                }`}
+              >
+                {isPreviewPlaying ? (
+                  <>
+                    <Pause className="w-3.5 h-3.5 fill-current" />
+                    <span>Jeda Cuplikan</span>
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-3.5 h-3.5 fill-current" />
+                    <span>Dengarkan Cuplikan Lagu</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Tips Penambahan Lagu Baru */}
+            <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-200 text-xs space-y-1">
+              <p className="font-semibold flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span>Cara Menambahkan Koleksi Lagu Baru:</span>
+              </p>
+              <p className="text-gray-300 leading-relaxed text-[11px]">
+                Cukup letakkan file audio baru (format <code className="text-amber-300">.mp3</code>) ke dalam folder <code className="text-amber-300">public/music/</code> di proyek Anda. Lagu baru tersebut akan langsung otomatis muncul di dropdown pilihan di atas.
+              </p>
+            </div>
+
+            {/* Action Save Button */}
+            <div className="pt-2 flex justify-end">
+              <button
+                type="submit"
+                disabled={isSavingMusic}
+                className="px-8 py-3 rounded-xl bg-gradient-to-r from-gold-500 to-gold-400 hover:from-gold-400 hover:to-gold-300 text-black font-semibold text-xs tracking-wider uppercase transition-all shadow-lg active:scale-95 disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+              >
+                <Save className="w-4 h-4" />
+                <span>{isSavingMusic ? 'Menyimpan Musik...' : 'Simpan Pengaturan Musik'}</span>
               </button>
             </div>
           </form>

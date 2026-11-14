@@ -23,7 +23,9 @@ export default function DesktopCover() {
   ];
 
   return (
-    <div className="hidden lg:flex lg:w-[58%] xl:w-[62%] h-screen sticky top-0 flex-col items-center justify-center text-center bg-[#EDE8E1] select-none overflow-hidden border-r border-[#E2DDD5] z-10">
+    <div className="hidden lg:flex lg:w-[58%] xl:w-[62%] h-screen sticky top-0 flex-col items-center justify-center text-center bg-gradient-to-r from-[#F5F1EB] via-[#EDE8E1] to-[#E2DDD5] select-none overflow-hidden z-10">
+      {/* Smooth Gradient Transition to Right Section */}
+      <div className="absolute right-0 top-0 bottom-0 w-32 xl:w-48 pointer-events-none bg-gradient-to-r from-transparent via-[#3A332C]/[0.04] to-[#3A332C]/[0.18] z-20" />
       {/* Dynamic Floating Particles */}
       {particles.map((p, idx) => (
         <div
