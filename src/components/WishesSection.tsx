@@ -184,11 +184,22 @@ export default function WishesSection({ initialGuestName = '' }: WishesSectionPr
                           </span>
                         )}
                       </div>
-                      <span className="text-[10px] text-[#8C847B]">
-                        {new Date(item.createdAt).toLocaleDateString('id-ID', {
-                          day: 'numeric',
-                          month: 'short',
-                        })}
+                      <span className="text-[10px] text-[#8C847B] shrink-0 font-medium">
+                        {(() => {
+                          try {
+                            const d = new Date(item.createdAt);
+                            if (isNaN(d.getTime())) return '';
+                            const dateStr = d.toLocaleDateString('id-ID', {
+                              day: 'numeric',
+                              month: 'short',
+                            });
+                            const hours = String(d.getHours()).padStart(2, '0');
+                            const minutes = String(d.getMinutes()).padStart(2, '0');
+                            return `${dateStr}, ${hours}:${minutes}`;
+                          } catch {
+                            return '';
+                          }
+                        })()}
                       </span>
                     </div>
 

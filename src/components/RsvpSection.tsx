@@ -128,40 +128,45 @@ export default function RsvpSection({ initialGuestName = '' }: RsvpSectionProps)
                   Konfirmasi Kehadiran
                 </label>
                 <div className="grid grid-cols-3 gap-2">
+                  {/* Hadir: Indikator Warna Hijau */}
                   <button
                     type="button"
                     onClick={() => setAttendance('hadir')}
-                    className={`p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all text-xs font-medium ${
+                    className={`p-2.5 sm:p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all text-xs cursor-pointer active:scale-95 ${
                       attendance === 'hadir'
-                        ? 'bg-[#4A453F] border-[#4A453F] text-white shadow-sm'
-                        : 'bg-[#FAF8F5] border-[#DDD6CC] text-[#6B635B] hover:border-[#8C7B6B]'
+                        ? 'bg-emerald-600 border-emerald-600 text-white shadow-md shadow-emerald-600/25 scale-[1.02] font-semibold'
+                        : 'bg-[#FAF8F5] border-[#DDD6CC] text-[#6B635B] hover:border-emerald-500/60 hover:text-emerald-700 font-medium'
                     }`}
                   >
-                    <Check className="w-3.5 h-3.5" />
+                    <Check className={`w-4 h-4 ${attendance === 'hadir' ? 'stroke-[2.5]' : ''}`} />
                     <span>Hadir</span>
                   </button>
+
+                  {/* Berhalangan: Indikator Warna Merah */}
                   <button
                     type="button"
                     onClick={() => setAttendance('tidak_hadir')}
-                    className={`p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all text-xs font-medium ${
+                    className={`p-2.5 sm:p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all text-xs cursor-pointer active:scale-95 ${
                       attendance === 'tidak_hadir'
-                        ? 'bg-[#4A453F] border-[#4A453F] text-white shadow-sm'
-                        : 'bg-[#FAF8F5] border-[#DDD6CC] text-[#6B635B] hover:border-[#8C7B6B]'
+                        ? 'bg-rose-600 border-rose-600 text-white shadow-md shadow-rose-600/25 scale-[1.02] font-semibold'
+                        : 'bg-[#FAF8F5] border-[#DDD6CC] text-[#6B635B] hover:border-rose-400/60 hover:text-rose-700 font-medium'
                     }`}
                   >
-                    <XCircle className="w-3.5 h-3.5" />
+                    <XCircle className={`w-4 h-4 ${attendance === 'tidak_hadir' ? 'stroke-[2.5]' : ''}`} />
                     <span>Berhalangan</span>
                   </button>
+
+                  {/* Ragu-ragu: Tetap Warna Saat Ini (#4A453F) */}
                   <button
                     type="button"
                     onClick={() => setAttendance('ragu')}
-                    className={`p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all text-xs font-medium ${
+                    className={`p-2.5 sm:p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all text-xs cursor-pointer active:scale-95 ${
                       attendance === 'ragu'
-                        ? 'bg-[#4A453F] border-[#4A453F] text-white shadow-sm'
-                        : 'bg-[#FAF8F5] border-[#DDD6CC] text-[#6B635B] hover:border-[#8C7B6B]'
+                        ? 'bg-[#4A453F] border-[#4A453F] text-white shadow-sm scale-[1.02] font-semibold'
+                        : 'bg-[#FAF8F5] border-[#DDD6CC] text-[#6B635B] hover:border-[#8C7B6B] font-medium'
                     }`}
                   >
-                    <HelpCircle className="w-3.5 h-3.5" />
+                    <HelpCircle className={`w-4 h-4 ${attendance === 'ragu' ? 'stroke-[2.5]' : ''}`} />
                     <span>Ragu-ragu</span>
                   </button>
                 </div>

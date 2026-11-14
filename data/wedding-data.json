@@ -66,6 +66,41 @@
   ],
   "wishes": [
     {
+      "id": "wish-1794643376579",
+      "name": "Mahesa",
+      "relationship": "Sahabat",
+      "message": "login mobile legend yok",
+      "createdAt": "2026-11-14T08:02:56.579Z"
+    },
+    {
+      "id": "wish-1794643357320",
+      "name": "Budi",
+      "relationship": "Tamu",
+      "message": "testt juga",
+      "createdAt": "2026-11-14T08:02:37.320Z"
+    },
+    {
+      "id": "wish-1794643343337",
+      "name": "Prabowo Subianto",
+      "relationship": "Sahabat",
+      "message": "testtttttttt",
+      "createdAt": "2026-11-14T08:02:23.337Z"
+    },
+    {
+      "id": "wish-1794643315242",
+      "name": "gibran",
+      "relationship": "Sahabat",
+      "message": "info loker",
+      "createdAt": "2026-11-14T08:01:55.242Z"
+    },
+    {
+      "id": "wish-1794643304322",
+      "name": "Prabowo Subianto",
+      "relationship": "Sahabat",
+      "message": "selamat bro",
+      "createdAt": "2026-11-14T08:01:44.322Z"
+    },
+    {
       "id": "wish-1794592971797",
       "name": "testing",
       "relationship": "Sahabat",

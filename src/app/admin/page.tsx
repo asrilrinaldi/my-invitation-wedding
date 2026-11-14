@@ -1081,12 +1081,23 @@ Hormat kami yang berbahagia,
                         <td className="py-3.5 px-4 text-gray-200 max-w-md">
                           {item.message}
                         </td>
-                        <td className="py-3.5 px-4 text-gray-500 text-[11px] whitespace-nowrap">
-                          {new Date(item.createdAt).toLocaleDateString('id-ID', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                          })}
+                        <td className="py-3.5 px-4 text-gray-400 text-[11px] whitespace-nowrap font-mono">
+                          {(() => {
+                            try {
+                              const d = new Date(item.createdAt);
+                              if (isNaN(d.getTime())) return '-';
+                              const dateStr = d.toLocaleDateString('id-ID', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric',
+                              });
+                              const hours = String(d.getHours()).padStart(2, '0');
+                              const minutes = String(d.getMinutes()).padStart(2, '0');
+                              return `${dateStr}, ${hours}:${minutes} WIB`;
+                            } catch {
+                              return '-';
+                            }
+                          })()}
                         </td>
                         <td className="py-3.5 px-4 text-right">
                           <button
