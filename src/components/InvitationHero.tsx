@@ -116,10 +116,17 @@ export default function InvitationHero({
           The Wedding of
         </p>
 
-        {/* Couple Names - Smaller, Not Bold, No Shadow */}
-        <h1 className="font-serif text-3xl sm:text-4xl text-white font-normal tracking-wide leading-tight">
-          {couple.groom.nickname} &amp; {couple.bride.nickname}
-        </h1>
+        {/* Logo Pengantin Monogram AS */}
+        <div className="flex justify-center items-center py-1">
+          <img
+            src="/logo/logo.PNG"
+            alt={`${couple.groom.nickname} & ${couple.bride.nickname}`}
+            className="h-20 sm:h-24 w-auto object-contain drop-shadow-md select-none pointer-events-none"
+          />
+          <h1 className="sr-only">
+            {couple.groom.nickname} &amp; {couple.bride.nickname}
+          </h1>
+        </div>
 
         {/* Date (2 lines) - Smaller size, elegant sans-serif */}
         <div className="text-[10px] sm:text-[11px] text-white/85 font-light tracking-[0.15em] uppercase space-y-0.5 font-sans">
@@ -164,8 +171,8 @@ export default function InvitationHero({
         ) : (
           /* After click: Countdown Timer & Recipient (Staggered Entrance Animation) */
           <div className="space-y-3 sm:space-y-4 pt-1">
-            {/* 4 Countdown Boxes - Staggered fade in up */}
-            <div className="grid grid-cols-4 gap-2 sm:gap-2.5 max-w-[280px] sm:max-w-[300px] mx-auto">
+            {/* 4 Countdown Circles Glass - Staggered fade in up */}
+            <div className="grid grid-cols-4 gap-2.5 sm:gap-3.5 max-w-[280px] sm:max-w-[310px] mx-auto">
               {[
                 { label: 'Hari', value: timeLeft.days },
                 { label: 'Jam', value: timeLeft.hours },
@@ -177,12 +184,14 @@ export default function InvitationHero({
                   className="flex flex-col items-center animate-fade-in-up"
                   style={{ animationDelay: `${idx * 90 + 80}ms`, animationFillMode: 'both' }}
                 >
-                  <div className="w-full bg-white/70 backdrop-blur-md rounded-xl py-2 px-1 text-center shadow-sm border border-white/40">
-                    <span className="block font-sans text-base sm:text-lg font-bold text-[#2E2824] leading-tight tracking-normal">
+                  {/* Frosted Glass Circle Coin */}
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/70 backdrop-blur-md border border-white/50 shadow-[0_4px_14px_rgba(44,40,37,0.14)] flex items-center justify-center transition-all duration-300 hover:scale-105 hover:bg-white/80">
+                    <span className="block font-sans text-base sm:text-lg font-bold text-[#2E2824] leading-none tracking-tight">
                       {String(item.value).padStart(2, '0')}
                     </span>
                   </div>
-                  <span className="block text-[10px] text-white font-sans font-medium tracking-wider mt-1">
+                  {/* Label below circle */}
+                  <span className="block text-[9.5px] sm:text-[10px] text-white/95 font-sans font-medium tracking-widest uppercase mt-1.5 drop-shadow-sm">
                     {item.label}
                   </span>
                 </div>

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ZoomIn } from 'lucide-react';
 import ScrollReveal from './ScrollReveal';
+import SectionDivider from './SectionDivider';
 
 const galleryItems = [
   { 
@@ -101,7 +102,25 @@ export default function GallerySection() {
   }, []);
 
   return (
-    <section id="gallery" className="py-20 px-6 max-w-xl mx-auto space-y-10">
+    <section id="gallery" className="relative py-20 px-6 max-w-xl mx-auto space-y-10 overflow-hidden">
+      {/* Background Ornamen Bayangan Dinding (Ambient Botanical Wall Shadow) */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden select-none -z-0">
+        <div className="absolute -top-12 -left-16 w-80 h-80 opacity-[0.06] blur-[12px] transform -rotate-12">
+          <svg viewBox="0 0 200 200" fill="#2C2825" className="w-full h-full">
+            <path d="M40,20 Q70,5 95,35 Q120,65 90,95 Q60,125 35,90 Q10,55 40,20 Z" />
+            <path d="M90,40 Q130,20 155,55 Q180,90 145,115 Q110,140 85,105 Q60,70 90,40 Z" />
+            <path d="M25,85 Q60,75 80,105 Q100,135 70,155 Q40,175 20,140 Q0,105 25,85 Z" />
+            <path d="M120,90 Q160,75 175,110 Q190,145 150,165 Q110,185 95,150 Q80,115 120,90 Z" />
+          </svg>
+        </div>
+        <div className="absolute -bottom-10 -right-16 w-88 h-88 opacity-[0.06] blur-[14px] transform rotate-45">
+          <svg viewBox="0 0 200 200" fill="#2C2825" className="w-full h-full">
+            <path d="M30,30 Q80,10 120,40 Q160,70 130,120 Q100,170 50,140 Q0,110 30,30 Z" />
+            <path d="M100,60 Q150,30 180,75 Q210,120 160,150 Q110,180 80,135 Q50,90 100,60 Z" />
+          </svg>
+        </div>
+      </div>
+
       <style>{`
         .photo-tape {
           box-shadow: 0 1px 3px rgba(74, 69, 63, 0.16);
@@ -118,16 +137,32 @@ export default function GallerySection() {
         .taped-card-6 { transform: rotate(1.8deg); }
 
         .taped-card {
+          transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Realistis Bayangan Jatuh ke Dinding (Wall Drop Shadow - Statis Tanpa Gerak Bergerak) */
+        .taped-paper {
+          background-color: #FFFFFF;
+          background-image: url('/images/paper-grain.png');
+          background-repeat: repeat;
+          background-size: 180px 180px;
+          box-shadow: 
+            0 20px 32px -6px rgba(44, 38, 32, 0.22),
+            0 8px 16px -3px rgba(44, 38, 32, 0.14),
+            0 2px 5px rgba(44, 38, 32, 0.08);
           transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
         }
 
         .taped-card:hover {
-          transform: rotate(0deg) scale(1.04) translateY(-4px) !important;
+          transform: rotate(0deg) scale(1.03) !important;
           z-index: 30 !important;
         }
 
         .taped-card:hover .taped-paper {
-          box-shadow: 0 16px 32px rgba(44, 40, 37, 0.22) !important;
+          box-shadow: 
+            0 26px 42px -8px rgba(44, 38, 32, 0.28),
+            0 12px 20px -3px rgba(44, 38, 32, 0.18),
+            0 3px 6px rgba(44, 38, 32, 0.1) !important;
         }
       `}</style>
 
@@ -139,7 +174,7 @@ export default function GallerySection() {
           <h2 className="text-3xl sm:text-4xl font-serif text-[#2C2825] font-normal">
             Galeri Foto
           </h2>
-          <div className="w-12 h-[1px] bg-[#C4BBB0] mx-auto mt-3" />
+          <SectionDivider />
         </div>
       </ScrollReveal>
 
@@ -177,7 +212,7 @@ export default function GallerySection() {
                 />
 
                 {/* Bingkai Kertas Foto Putih (Photo Paper) */}
-                <div className="taped-paper bg-white p-2 sm:p-2.5 pb-3 sm:pb-4 shadow-[0_6px_18px_rgba(44,40,37,0.13)] border border-[#E8E1D5] transition-all duration-300">
+                <div className="taped-paper bg-white p-2 sm:p-2.5 pb-3 sm:pb-4 border border-[#E8E1D5]">
                   <div className="relative aspect-square w-full overflow-hidden bg-[#FAF8F5]">
                     <img
                       src={item.src}
@@ -231,7 +266,7 @@ export default function GallerySection() {
                 />
 
                 {/* Bingkai Kertas Foto Putih (Photo Paper) */}
-                <div className="taped-paper bg-white p-2 sm:p-2.5 pb-3 sm:pb-4 shadow-[0_6px_18px_rgba(44,40,37,0.13)] border border-[#E8E1D5] transition-all duration-300">
+                <div className="taped-paper bg-white p-2 sm:p-2.5 pb-3 sm:pb-4 border border-[#E8E1D5]">
                   <div className="relative aspect-square w-full overflow-hidden bg-[#FAF8F5]">
                     <img
                       src={item.src}

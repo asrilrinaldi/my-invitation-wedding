@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Send, Sparkles } from 'lucide-react';
 import { Wish } from '@/lib/types';
 import ScrollReveal from './ScrollReveal';
+import SectionDivider from './SectionDivider';
 
 interface WishesSectionProps {
   initialGuestName?: string;
@@ -74,7 +75,7 @@ export default function WishesSection({ initialGuestName = '' }: WishesSectionPr
           <h2 className="text-3xl sm:text-4xl font-serif text-[#2C2825] font-normal">
             Buku Tamu
           </h2>
-          <div className="w-12 h-[1px] bg-[#C4BBB0] mx-auto mt-3" />
+          <SectionDivider />
           <p className="text-xs text-[#6B635B] pt-2">
             Tinggalkan pesan cinta dan doa hangat untuk kedua mempelai.
           </p>

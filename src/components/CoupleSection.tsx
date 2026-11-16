@@ -4,6 +4,7 @@ import React from 'react';
 import { Instagram, Heart } from 'lucide-react';
 import { useCouple } from '@/lib/context/CoupleContext';
 import ScrollReveal from './ScrollReveal';
+import SectionDivider from './SectionDivider';
 
 export default function CoupleSection() {
   const { groom, bride } = useCouple();
@@ -32,7 +33,7 @@ export default function CoupleSection() {
           <h2 className="text-3xl sm:text-4xl font-serif text-[#2C2825] font-normal">
             Pengantin
           </h2>
-          <div className="w-12 h-[1px] bg-[#C4BBB0] mx-auto mt-3" />
+          <SectionDivider />
         </div>
       </ScrollReveal>
 
@@ -40,16 +41,18 @@ export default function CoupleSection() {
       <div className="space-y-10">
         {/* Groom */}
         <ScrollReveal animation="fade-up" delay={250} duration={800}>
-          <div className="serein-card serein-card-hover rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center">
-            <div className="relative w-40 h-40 mb-5 rounded-full p-1 bg-gradient-to-tr from-[#D1C7BA] via-[#EDE7DF] to-[#B3A697] shadow-md">
-              <div className="w-full h-full rounded-full overflow-hidden bg-[#F0EBE3]">
+          <div className="group serein-card serein-card-hover rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center">
+            {/* Arch / Dome Frame Mempelai Pria */}
+            <div className="relative w-44 sm:w-48 aspect-[3/4] mb-6 rounded-t-full rounded-b-2xl p-1.5 bg-gradient-to-b from-[#DDD4C7] via-[#EDE7DF] to-[#C9BDB0] shadow-[0_10px_25px_rgba(44,40,37,0.12)]">
+              <div className="w-full h-full rounded-t-full rounded-b-xl overflow-hidden bg-[#F0EBE3] relative border border-white/70">
                 <img 
                   src={groom.photo} 
                   alt={groom.fullName} 
-                  className="w-full h-full object-cover object-top"
+                  className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
                 />
               </div>
             </div>
+
             <h3 className="text-2xl font-serif text-[#2C2825] font-semibold mb-1">
               {groom.fullName}
             </h3>
@@ -87,16 +90,18 @@ export default function CoupleSection() {
 
         {/* Bride */}
         <ScrollReveal animation="fade-up" delay={380} duration={800}>
-          <div className="serein-card serein-card-hover rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center">
-            <div className="relative w-40 h-40 mb-5 rounded-full p-1 bg-gradient-to-tr from-[#D1C7BA] via-[#EDE7DF] to-[#B3A697] shadow-md">
-              <div className="w-full h-full rounded-full overflow-hidden bg-[#F0EBE3]">
+          <div className="group serein-card serein-card-hover rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center">
+            {/* Arch / Dome Frame Mempelai Wanita */}
+            <div className="relative w-44 sm:w-48 aspect-[3/4] mb-6 rounded-t-full rounded-b-2xl p-1.5 bg-gradient-to-b from-[#DDD4C7] via-[#EDE7DF] to-[#C9BDB0] shadow-[0_10px_25px_rgba(44,40,37,0.12)]">
+              <div className="w-full h-full rounded-t-full rounded-b-xl overflow-hidden bg-[#F0EBE3] relative border border-white/70">
                 <img 
                   src={bride.photo} 
                   alt={bride.fullName} 
-                  className="w-full h-full object-cover object-top"
+                  className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
                 />
               </div>
             </div>
+
             <h3 className="text-2xl font-serif text-[#2C2825] font-semibold mb-1">
               {bride.fullName}
             </h3>

@@ -79,8 +79,15 @@ function WeddingInvitationContent() {
       {/* Left Pane for Desktop */}
       <DesktopCover />
 
-      {/* Right Pane: Invitation Screen */}
-      <main className="w-full lg:w-[42%] xl:w-[38%] min-h-screen bg-[#FAF8F5] relative z-20 shadow-[-20px_0_50px_-10px_rgba(46,41,37,0.22)] overflow-x-hidden">
+      {/* Right Pane: Invitation Screen with Cotton Paper Grain Texture */}
+      <main 
+        className="w-full lg:w-[42%] xl:w-[38%] min-h-screen bg-[#FAF8F5] relative z-20 shadow-[-20px_0_50px_-10px_rgba(46,41,37,0.22)] overflow-x-hidden"
+        style={{
+          backgroundImage: "url('/images/paper-grain.png')",
+          backgroundRepeat: 'repeat',
+          backgroundSize: '180px 180px',
+        }}
+      >
         {/* Smooth Gradient Seam along the left edge of Right Section on Desktop */}
         <div className="hidden lg:block absolute left-0 top-0 bottom-0 w-16 xl:w-24 pointer-events-none z-30 bg-gradient-to-r from-black/25 via-black/8 to-transparent" />
 

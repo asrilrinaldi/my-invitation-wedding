@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import confetti from 'canvas-confetti';
 import { CheckCircle2, Send, Users, User, Check, XCircle, HelpCircle } from 'lucide-react';
 import ScrollReveal from './ScrollReveal';
+import SectionDivider from './SectionDivider';
 
 interface RsvpSectionProps {
   initialGuestName?: string;
@@ -71,7 +72,7 @@ export default function RsvpSection({ initialGuestName = '' }: RsvpSectionProps)
           <h2 className="text-3xl sm:text-4xl font-serif text-[#2C2825] font-normal">
             RSVP
           </h2>
-          <div className="w-12 h-[1px] bg-[#C4BBB0] mx-auto mt-3" />
+          <SectionDivider />
           <p className="text-xs text-[#6B635B] pt-2">
             Merupakan suatu kehormatan bagi kami apabila Anda berkenan hadir dan memberikan doa restu.
           </p>

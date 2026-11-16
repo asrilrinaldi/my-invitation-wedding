@@ -23,7 +23,14 @@ export default function DesktopCover() {
   ];
 
   return (
-    <div className="hidden lg:flex lg:w-[58%] xl:w-[62%] h-screen sticky top-0 flex-col items-center justify-center text-center bg-gradient-to-r from-[#F5F1EB] via-[#EDE8E1] to-[#E2DDD5] select-none overflow-hidden z-10">
+    <div 
+      className="hidden lg:flex lg:w-[58%] xl:w-[62%] h-screen sticky top-0 flex-col items-center justify-center text-center bg-gradient-to-r from-[#F5F1EB] via-[#EDE8E1] to-[#E2DDD5] select-none overflow-hidden z-10"
+      style={{
+        backgroundImage: "url('/images/paper-grain.png')",
+        backgroundRepeat: 'repeat',
+        backgroundSize: '180px 180px',
+      }}
+    >
       {/* Smooth Gradient Transition to Right Section */}
       <div className="absolute right-0 top-0 bottom-0 w-32 xl:w-48 pointer-events-none bg-gradient-to-r from-transparent via-[#3A332C]/[0.04] to-[#3A332C]/[0.18] z-20" />
       {/* Dynamic Floating Particles */}
@@ -43,17 +50,24 @@ export default function DesktopCover() {
         />
       ))}
 
-      {/* Clean Centered Typography without bold, smaller size, no date or city */}
-      <div className="relative z-10 px-8 space-y-2 max-w-lg">
+      {/* Clean Centered Typography with Logo Monogram */}
+      <div className="relative z-10 px-8 space-y-3 max-w-lg">
         {/* The Wedding of - Smaller, Not Italic, No Shadow */}
         <p className="font-serif text-xs md:text-sm text-[#7A736B] tracking-[0.2em] uppercase font-normal not-italic">
           The Wedding of
         </p>
 
-        {/* Couple Names - Smaller, Not Bold */}
-        <h1 className="font-serif text-3xl sm:text-4xl lg:text-[44px] text-[#2E2925] tracking-tight font-normal leading-tight">
-          {groom.nickname} &amp; {bride.nickname}
-        </h1>
+        {/* Logo Pengantin Monogram AS */}
+        <div className="flex justify-center items-center py-1">
+          <img
+            src="/logo/logo.PNG"
+            alt={`${groom.nickname} & ${bride.nickname}`}
+            className="h-24 md:h-32 w-auto object-contain brightness-0 opacity-80 select-none pointer-events-none drop-shadow-sm"
+          />
+          <h1 className="sr-only">
+            {groom.nickname} &amp; {bride.nickname}
+          </h1>
+        </div>
       </div>
     </div>
   );

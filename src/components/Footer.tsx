@@ -2,9 +2,10 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Heart, ShieldCheck } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 import { useCouple } from '@/lib/context/CoupleContext';
 import ScrollReveal from './ScrollReveal';
+import SectionDivider from './SectionDivider';
 
 export default function Footer() {
   const { groom, bride } = useCouple();
@@ -13,13 +14,18 @@ export default function Footer() {
     <footer className="relative py-16 px-6 border-t border-[#E5DFD6] text-center space-y-6 bg-[#F5F0E8] overflow-hidden">
       <div className="max-w-md mx-auto space-y-3">
         <ScrollReveal animation="fade-up" duration={700}>
-          <Heart className="w-5 h-5 mx-auto text-[#A38C75] fill-[#A38C75]/20 animate-pulse mb-3" />
+          {/* Logo Monogram AS sebagai Signature Seal Penutup */}
+          <div className="flex justify-center items-center mb-3">
+            <img
+              src="/logo/logo.PNG"
+              alt={`${groom.nickname} & ${bride.nickname}`}
+              className="h-20 sm:h-24 w-auto object-contain brightness-0 opacity-80 select-none pointer-events-none drop-shadow-sm transition-transform duration-500 hover:scale-105"
+            />
+          </div>
 
-          <h3 className="text-2xl sm:text-3xl font-serif text-[#2C2825]">
-            {groom.nickname} &amp; {bride.nickname}
-          </h3>
+          <SectionDivider className="my-3 opacity-70" />
 
-          <p className="text-xs text-[#6B635B] italic leading-relaxed pt-2">
+          <p className="text-xs text-[#6B635B] italic leading-relaxed pt-1">
             Atas kehadiran dan doa restu Bapak/Ibu/Saudara/i sekalian, kami sekeluarga mengucapkan terima kasih yang tak terhingga.
           </p>
         </ScrollReveal>

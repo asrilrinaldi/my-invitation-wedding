@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { loveStories } from '@/lib/data';
 import ScrollReveal from './ScrollReveal';
+import SectionDivider from './SectionDivider';
 
 export default function LoveStorySection() {
   const sectionRef = useRef<HTMLDivElement | null>(null);
@@ -94,7 +95,7 @@ export default function LoveStorySection() {
           <h2 className="text-3xl sm:text-4xl font-serif text-[#2C2825] font-normal">
             Kisah Kami
           </h2>
-          <div className="w-12 h-[1px] bg-[#C4BBB0] mx-auto mt-3" />
+          <SectionDivider />
         </div>
       </ScrollReveal>
 

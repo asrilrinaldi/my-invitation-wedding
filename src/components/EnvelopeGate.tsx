@@ -62,10 +62,17 @@ export default function EnvelopeGate({ guestName, onOpen }: EnvelopeGateProps) {
           The Wedding Celebration of
         </p>
 
-        {/* Couple Names */}
-        <h1 className="text-4xl sm:text-5xl font-serif tracking-wider text-gold-gradient font-bold mb-6">
-          {weddingConfig.couple.groom.nickname} &amp; {weddingConfig.couple.bride.nickname}
-        </h1>
+        {/* Logo Pengantin */}
+        <div className="flex justify-center items-center py-2 mb-4">
+          <img 
+            src="/logo/logo.PNG" 
+            alt={`${weddingConfig.couple.groom.nickname} & ${weddingConfig.couple.bride.nickname}`}
+            className="h-20 sm:h-24 w-auto object-contain drop-shadow-md select-none pointer-events-none"
+          />
+          <h1 className="sr-only">
+            {weddingConfig.couple.groom.nickname} &amp; {weddingConfig.couple.bride.nickname}
+          </h1>
+        </div>
 
         {/* Decorative Wax Seal Card */}
         <div className="relative mx-auto my-6 w-36 h-36 rounded-full p-[2px] bg-gradient-to-tr from-gold-600 via-gold-300 to-gold-700 shadow-xl shadow-gold-500/10">
