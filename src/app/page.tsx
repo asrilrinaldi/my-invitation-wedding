@@ -6,7 +6,6 @@ import DesktopCover from '@/components/DesktopCover';
 import InvitationHero from '@/components/InvitationHero';
 import FloatingNavbar from '@/components/FloatingNavbar';
 import QrCodeButton from '@/components/QrCodeButton';
-import FallingPetals from '@/components/FallingPetals';
 import AudioPlayer from '@/components/AudioPlayer';
 import CoupleSection from '@/components/CoupleSection';
 import EventSection from '@/components/EventSection';
@@ -120,7 +119,6 @@ function WeddingInvitationContent() {
       {/* Floating Elements at top level for reliable fixed positioning & clicks */}
       {isUnlocked && (
         <>
-          <FallingPetals />
           <FloatingNavbar />
           <QrCodeButton guestName={displayName} />
         </>

@@ -2,22 +2,20 @@
 
 import React, { useEffect, useRef } from 'react';
 
-interface PetalParticle {
+interface GoldenDustParticle {
   x: number;
   y: number;
-  size: number;
+  radius: number;
   speedY: number;
   speedX: number;
   swayAngle: number;
   swaySpeed: number;
   swayRadius: number;
-  rotation: number;
-  rotationSpeed: number;
-  flipAngle: number;
-  flipSpeed: number;
+  baseOpacity: number;
+  pulseSpeed: number;
+  pulseAngle: number;
   color: string;
-  opacity: number;
-  shapeType: number; // 0: classic rose, 1: fluttering petal, 2: slender petal
+  glowRadius: number;
 }
 
 export default function FallingPetals() {
@@ -34,25 +32,24 @@ export default function FallingPetals() {
     let width = 0;
     let height = 0;
 
-    // Palette warna kelopak bunga romantis (soft blush, rose, peach & champagne)
-    const petalColors = [
-      '#F8D7DA', // Soft blush pink
-      '#F4CCD1', // Delicate rose
-      '#F7E5DE', // Warm peach
-      '#FAF2EA', // Champagne ivory
-      '#ECC5CB', // Romantic cherry blossom
-      '#F9EBEA', // Pale rose petal
+    // Palet warna emas hangat & champagne elegan (senada dengan warna aksen website)
+    const goldTones = [
+      '#D4AF37', // Classic Wedding Gold
+      '#E6C687', // Soft Champagne
+      '#F3E5AB', // Warm Sunlight Amber
+      '#C5A880', // Muted Earthy Taupe Gold
+      '#F7E5C8', // Pale Golden Glow
     ];
 
-    // Responsive: Pada layar HP/mobile kurangi jumlah kelopak (12-14 kelopak) agar ultra-ringan 60 FPS
+    // Jumlah partikel sangat minimalis (8 di HP, 14 di Desktop) agar tidak mendistraksi
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-    const petalCount = isMobile ? 13 : 22;
+    const particleCount = isMobile ? 9 : 15;
 
-    const petals: PetalParticle[] = [];
+    const particles: GoldenDustParticle[] = [];
 
     const handleResize = () => {
       const rect = canvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap at 2 for performance
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       width = rect.width;
       height = rect.height;
 
@@ -65,73 +62,25 @@ export default function FallingPetals() {
     handleResize();
     window.addEventListener('resize', handleResize, { passive: true });
 
-    // Inisialisasi posisi kelopak (disebar di seluruh layar sejak awal)
-    for (let i = 0; i < petalCount; i++) {
-      petals.push({
+    // Inisialisasi butiran debu emas (disebar merata sejak awal)
+    for (let i = 0; i < particleCount; i++) {
+      const radius = isMobile ? 1.5 + Math.random() * 1.8 : 2.0 + Math.random() * 2.2;
+      particles.push({
         x: Math.random() * (width || 400),
-        y: Math.random() * (height || 800), // Sudah tersebar merata saat undangan dibuka
-        size: isMobile ? 12 + Math.random() * 8 : 14 + Math.random() * 10,
-        speedY: isMobile ? 0.7 + Math.random() * 0.9 : 0.8 + Math.random() * 1.1, // Gerak jatuh santai & anggun
-        speedX: (Math.random() - 0.5) * 0.4,
+        y: Math.random() * (height || 800),
+        radius,
+        glowRadius: radius * (3.5 + Math.random() * 2.5), // Pendaran cahaya lembut
+        speedY: 0.25 + Math.random() * 0.45,             // Melayang sangat lambat & tenang
+        speedX: (Math.random() - 0.5) * 0.15,
         swayAngle: Math.random() * Math.PI * 2,
-        swaySpeed: 0.02 + Math.random() * 0.025,
-        swayRadius: isMobile ? 1.0 + Math.random() * 1.2 : 1.3 + Math.random() * 1.5,
-        rotation: Math.random() * Math.PI * 2,
-        rotationSpeed: (Math.random() - 0.5) * 0.02,
-        flipAngle: Math.random() * Math.PI * 2,
-        flipSpeed: 0.025 + Math.random() * 0.035, // Efek berputar 3D tertiup angin
-        color: petalColors[i % petalColors.length],
-        opacity: 0.7 + Math.random() * 0.22,
-        shapeType: i % 3,
+        swaySpeed: 0.012 + Math.random() * 0.015,
+        swayRadius: 0.6 + Math.random() * 0.8,
+        baseOpacity: 0.35 + Math.random() * 0.35,
+        pulseSpeed: 0.02 + Math.random() * 0.03,        // Efek kerlap-kerlip lembut (twinkle)
+        pulseAngle: Math.random() * Math.PI * 2,
+        color: goldTones[i % goldTones.length],
       });
     }
-
-    // Fungsi menggambar kelopak bunga berbasis kurva Bezier murni (tanpa DOM/SVG filter)
-    const drawPetal = (p: PetalParticle) => {
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rotation);
-
-      // Skala horizontal mengikuti cosinus untuk efek 3D flip (berputar di udara)
-      const flipScale = Math.cos(p.flipAngle);
-      ctx.scale(flipScale, 1);
-
-      ctx.fillStyle = p.color;
-      ctx.globalAlpha = p.opacity;
-
-      ctx.beginPath();
-      const s = p.size;
-
-      if (p.shapeType === 0) {
-        // Kelopak mawar klasik
-        ctx.moveTo(0, -s * 0.7);
-        ctx.bezierCurveTo(s * 0.6, -s * 0.7, s * 0.8, s * 0.3, 0, s);
-        ctx.bezierCurveTo(-s * 0.8, s * 0.3, -s * 0.6, -s * 0.7, 0, -s * 0.7);
-      } else if (p.shapeType === 1) {
-        // Kelopak melengkung asimetris
-        ctx.moveTo(-s * 0.3, -s * 0.6);
-        ctx.bezierCurveTo(s * 0.7, -s * 0.5, s * 0.9, s * 0.5, 0, s * 0.9);
-        ctx.bezierCurveTo(-s * 0.7, s * 0.6, -s * 0.8, -s * 0.1, -s * 0.3, -s * 0.6);
-      } else {
-        // Kelopak ramping berujung lancip halus
-        ctx.moveTo(0, -s * 0.8);
-        ctx.bezierCurveTo(s * 0.45, -s * 0.4, s * 0.55, s * 0.4, 0, s * 0.9);
-        ctx.bezierCurveTo(-s * 0.55, s * 0.4, -s * 0.45, -s * 0.4, 0, -s * 0.8);
-      }
-
-      ctx.fill();
-
-      // Garis urat kelopak halus (sangat lembut)
-      ctx.strokeStyle = '#E8A7B0';
-      ctx.lineWidth = 0.6;
-      ctx.globalAlpha = p.opacity * 0.35;
-      ctx.beginPath();
-      ctx.moveTo(0, -s * 0.5);
-      ctx.lineTo(0, s * 0.6);
-      ctx.stroke();
-
-      ctx.restore();
-    };
 
     let isRunning = true;
 
@@ -140,30 +89,51 @@ export default function FallingPetals() {
 
       ctx.clearRect(0, 0, width, height);
 
-      for (let i = 0; i < petals.length; i++) {
-        const p = petals[i];
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
 
-        // Update fisika kelopak
+        // Fisika melayang tenang
         p.y += p.speedY;
         p.swayAngle += p.swaySpeed;
         p.x += Math.sin(p.swayAngle) * p.swayRadius + p.speedX;
-        p.rotation += p.rotationSpeed;
-        p.flipAngle += p.flipSpeed;
+        p.pulseAngle += p.pulseSpeed;
 
-        // Jika keluar dari layar bawah, munculkan kembali dari atas
-        if (p.y > height + 25) {
-          p.y = -20;
+        // Wrap around layar
+        if (p.y > height + 20) {
+          p.y = -15;
           p.x = Math.random() * width;
         }
-
-        // Jika melayang keluar dari sisi kiri atau kanan
-        if (p.x < -30) {
-          p.x = width + 20;
-        } else if (p.x > width + 30) {
-          p.x = -20;
+        if (p.x < -20) {
+          p.x = width + 15;
+        } else if (p.x > width + 20) {
+          p.x = -15;
         }
 
-        drawPetal(p);
+        // Efek kedip cahaya halus (sinusoidal pulse)
+        const pulse = 0.75 + Math.sin(p.pulseAngle) * 0.25;
+        const currentOpacity = Math.max(0.15, Math.min(0.85, p.baseOpacity * pulse));
+
+        // Gambar pendaran cahaya emas lembut (Soft Ambient Halo)
+        ctx.save();
+        const radGrad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.glowRadius);
+        radGrad.addColorStop(0, p.color);
+        radGrad.addColorStop(0.4, p.color);
+        radGrad.addColorStop(1, 'transparent');
+
+        ctx.fillStyle = radGrad;
+        ctx.globalAlpha = currentOpacity * 0.65;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.glowRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Inti titik emas yang bersinar lembut di tengah
+        ctx.fillStyle = '#FFFDF5';
+        ctx.globalAlpha = Math.min(1, currentOpacity * 1.2);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius * 0.55, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
       }
 
       animationFrameId = requestAnimationFrame(render);
@@ -171,7 +141,7 @@ export default function FallingPetals() {
 
     animationFrameId = requestAnimationFrame(render);
 
-    // Pause animasi saat tab tidak aktif untuk hemat baterai & memori
+    // Hemat baterai saat tab tidak fokus
     const handleVisibilityChange = () => {
       if (document.hidden) {
         isRunning = false;

@@ -14,6 +14,17 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
   title: "The Wedding of Asril & Sisi",
   description: "Undangan Pernikahan Asril Rinaldi & Sisi Dian Yuriska - Minggu, 20 Juni 2027",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "32x32" },
+      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+  },
   openGraph: {
     title: "The Wedding of Asril & Sisi",
     description: "Kami mengundang Anda untuk hadir dalam momen bahagia pernikahan Asril & Sisi.",
