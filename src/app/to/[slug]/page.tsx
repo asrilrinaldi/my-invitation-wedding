@@ -14,7 +14,7 @@ interface PageProps {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const guest = getGuestBySlug(params.slug);
+  const guest = await getGuestBySlug(params.slug);
   
   if (!guest) {
     return {
@@ -41,8 +41,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default function GuestInvitationPage({ params }: PageProps) {
-  const guest = getGuestBySlug(params.slug);
+export default async function GuestInvitationPage({ params }: PageProps) {
+  const guest = await getGuestBySlug(params.slug);
 
   // STRICT WHITELIST PROTECTION:
   // If the slug is NOT in the database, reject access immediately with 404!
@@ -52,7 +52,7 @@ export default function GuestInvitationPage({ params }: PageProps) {
   }
 
   // Mark guest as opened
-  markGuestOpened(params.slug);
+  await markGuestOpened(params.slug);
 
   return (
     <ClientInvitation 

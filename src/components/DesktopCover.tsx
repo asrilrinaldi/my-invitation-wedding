@@ -50,6 +50,23 @@ export default function DesktopCover() {
         />
       ))}
 
+      {/* Botanical Lily Accents for Luxury Editorial Framing */}
+      <div className="absolute -bottom-10 -left-10 w-72 xl:w-88 pointer-events-none opacity-20 xl:opacity-25 select-none transition-opacity duration-1000">
+        <img
+          src="/images/lily-desktop-corner.png"
+          alt="Botanical Lily"
+          className="w-full h-auto object-contain filter drop-shadow-[0_4px_16px_rgba(44,40,37,0.15)]"
+        />
+      </div>
+
+      <div className="absolute -top-12 -left-12 w-56 xl:w-68 pointer-events-none opacity-15 xl:opacity-20 select-none rotate-180">
+        <img
+          src="/images/lily-desktop-corner.png"
+          alt="Botanical Lily Accent"
+          className="w-full h-auto object-contain filter drop-shadow-[0_4px_16px_rgba(44,40,37,0.12)]"
+        />
+      </div>
+
       {/* Clean Centered Typography with Logo Monogram */}
       <div className="relative z-10 px-8 space-y-3 max-w-lg">
         {/* The Wedding of - Smaller, Not Italic, No Shadow */}

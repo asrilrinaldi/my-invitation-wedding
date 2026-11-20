@@ -6,7 +6,7 @@ export const revalidate = 0;
 
 export async function GET() {
   try {
-    const current = getMusic();
+    const current = await getMusic();
     const tracks = getAvailableMusicTracks();
     return NextResponse.json(
       { success: true, data: current, options: tracks },
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const updated = saveMusic({
+    const updated = await saveMusic({
       url: body.url,
       title: body.title || 'Wedding Romantic Music',
     });

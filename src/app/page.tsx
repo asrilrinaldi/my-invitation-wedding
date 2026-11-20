@@ -7,6 +7,7 @@ import InvitationHero from '@/components/InvitationHero';
 import FloatingNavbar from '@/components/FloatingNavbar';
 import QrCodeButton from '@/components/QrCodeButton';
 import AudioPlayer from '@/components/AudioPlayer';
+import PagePreloader from '@/components/PagePreloader';
 import CoupleSection from '@/components/CoupleSection';
 import EventSection from '@/components/EventSection';
 import LoveStorySection from '@/components/LoveStorySection';
@@ -75,6 +76,9 @@ function WeddingInvitationContent() {
 
   return (
     <div className="min-h-screen bg-[#EDE8E1] flex flex-col lg:flex-row relative">
+      {/* Loading Intro Animation with Logo Color-Fill */}
+      <PagePreloader />
+
       {/* Left Pane for Desktop */}
       <DesktopCover />
 
@@ -129,11 +133,7 @@ function WeddingInvitationContent() {
 
 export default function HomePage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-[#EDE8E1] flex items-center justify-center text-[#59524A] font-serif">
-        Memuat Undangan...
-      </div>
-    }>
+    <Suspense fallback={<PagePreloader />}>
       <WeddingInvitationContent />
     </Suspense>
   );

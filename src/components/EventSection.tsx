@@ -132,10 +132,19 @@ export default function EventSection() {
         </ScrollReveal>
 
         <div className="space-y-6">
-          {/* Akad Nikah - Transparan Frosted Glass Card */}
+          {/* Akad Nikah - Transparan Frosted Glass Card with Lily Watermark */}
           <ScrollReveal animation="fade-up" delay={150}>
-            <div className="bg-white/75 hover:bg-white/85 backdrop-blur-md rounded-3xl p-6 sm:p-8 text-center space-y-4 border border-white/70 shadow-[0_8px_30px_rgba(74,69,63,0.08)] hover:shadow-xl transition-all duration-300">
-              <div className="w-11 h-11 rounded-full bg-white/90 text-[#8C7B6B] border border-white/80 shadow-sm mx-auto flex items-center justify-center">
+            <div className="relative overflow-hidden bg-white/75 hover:bg-white/85 backdrop-blur-md rounded-3xl p-6 sm:p-8 text-center space-y-4 border border-white/70 shadow-[0_8px_30px_rgba(74,69,63,0.08)] hover:shadow-xl transition-all duration-300">
+              {/* Botanical Lily Watermark Accent */}
+              <div className="absolute -bottom-8 -right-8 w-36 sm:w-44 pointer-events-none opacity-[0.12] select-none">
+                <img
+                  src="/images/lily-desktop-corner.png"
+                  alt="Lily Watermark"
+                  className="w-full h-auto object-contain"
+                />
+              </div>
+
+              <div className="relative z-10 w-11 h-11 rounded-full bg-white/90 text-[#8C7B6B] border border-white/80 shadow-sm mx-auto flex items-center justify-center">
                 <Clock className="w-5 h-5" />
               </div>
               <h3 className="text-2xl font-serif font-semibold text-[#2C2825]">
@@ -175,10 +184,19 @@ export default function EventSection() {
             </div>
           </ScrollReveal>
 
-          {/* Resepsi - Transparan Frosted Glass Card */}
+          {/* Resepsi - Transparan Frosted Glass Card with Lily Watermark */}
           <ScrollReveal animation="fade-up" delay={250}>
-            <div className="bg-white/75 hover:bg-white/85 backdrop-blur-md rounded-3xl p-6 sm:p-8 text-center space-y-4 border border-white/70 shadow-[0_8px_30px_rgba(74,69,63,0.08)] hover:shadow-xl transition-all duration-300">
-              <div className="w-11 h-11 rounded-full bg-white/90 text-[#8C7B6B] border border-white/80 shadow-sm mx-auto flex items-center justify-center">
+            <div className="relative overflow-hidden bg-white/75 hover:bg-white/85 backdrop-blur-md rounded-3xl p-6 sm:p-8 text-center space-y-4 border border-white/70 shadow-[0_8px_30px_rgba(74,69,63,0.08)] hover:shadow-xl transition-all duration-300">
+              {/* Botanical Lily Watermark Accent */}
+              <div className="absolute -bottom-8 -left-8 w-36 sm:w-44 pointer-events-none opacity-[0.12] select-none -scale-x-100">
+                <img
+                  src="/images/lily-desktop-corner.png"
+                  alt="Lily Watermark"
+                  className="w-full h-auto object-contain"
+                />
+              </div>
+
+              <div className="relative z-10 w-11 h-11 rounded-full bg-white/90 text-[#8C7B6B] border border-white/80 shadow-sm mx-auto flex items-center justify-center">
                 <Navigation className="w-5 h-5" />
               </div>
               <h3 className="text-2xl font-serif font-semibold text-[#2C2825]">

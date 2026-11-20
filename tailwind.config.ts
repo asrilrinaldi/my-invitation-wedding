@@ -8,6 +8,14 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      zIndex: {
+        '10': '10',
+        '20': '20',
+        '25': '25',
+        '30': '30',
+        '40': '40',
+        '50': '50',
+      },
       colors: {
         serein: {
           bg: '#EDE8E1',

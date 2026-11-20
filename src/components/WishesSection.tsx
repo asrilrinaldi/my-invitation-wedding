@@ -15,15 +15,15 @@ export default function WishesSection({ initialGuestName = '' }: WishesSectionPr
   const [name, setName] = useState(initialGuestName);
   const [relationship, setRelationship] = useState('Sahabat');
   const [message, setMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchWishes = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/wishes');
+      const res = await fetch('/api/wishes', { cache: 'no-store' });
       const data = await res.json();
-      if (data.success) {
+      if (data.success && Array.isArray(data.data)) {
         setWishes(data.data);
       }
     } catch (err) {
@@ -158,57 +158,55 @@ export default function WishesSection({ initialGuestName = '' }: WishesSectionPr
           </ScrollReveal>
 
           <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
-            {wishes.length === 0 ? (
-              <ScrollReveal animation="fade-up" delay={300}>
-                <div className="serein-card rounded-2xl p-6 text-center text-[#8C847B] text-xs">
-                  Belum ada ucapan. Jadilah yang pertama memberikan doa restu!
-                </div>
-              </ScrollReveal>
+            {isLoading && wishes.length === 0 ? (
+              <div className="serein-card rounded-2xl p-6 text-center text-[#8C847B] text-xs animate-pulse">
+                Memuat ucapan &amp; doa...
+              </div>
+            ) : wishes.length === 0 ? (
+              <div className="serein-card rounded-2xl p-6 text-center text-[#8C847B] text-xs">
+                Belum ada ucapan. Jadilah yang pertama memberikan doa restu!
+              </div>
             ) : (
-              wishes.map((item, idx) => (
-                <ScrollReveal 
+              wishes.map((item) => (
+                <div 
                   key={item.id} 
-                  animation="fade-up" 
-                  delay={Math.min(idx * 80 + 200, 500)} 
-                  duration={650}
+                  className="serein-card rounded-2xl p-4 text-left space-y-1.5 transition-all duration-300 hover:shadow-md"
                 >
-                  <div className="serein-card rounded-2xl p-4 text-left space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-[#EAE4DC] text-[#4A453F] flex items-center justify-center text-[10px] font-bold">
-                          {item.name.charAt(0).toUpperCase()}
-                        </div>
-                        <p className="text-xs font-semibold text-[#2C2825]">{item.name}</p>
-                        {item.relationship && (
-                          <span className="text-[9px] text-[#6E655B] bg-[#EFEAE2] px-1.5 py-0.5 rounded-full">
-                            {item.relationship}
-                          </span>
-                        )}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-[#EAE4DC] text-[#4A453F] flex items-center justify-center text-[10px] font-bold">
+                        {item.name.charAt(0).toUpperCase()}
                       </div>
-                      <span className="text-[10px] text-[#8C847B] shrink-0 font-medium">
-                        {(() => {
-                          try {
-                            const d = new Date(item.createdAt);
-                            if (isNaN(d.getTime())) return '';
-                            const dateStr = d.toLocaleDateString('id-ID', {
-                              day: 'numeric',
-                              month: 'short',
-                            });
-                            const hours = String(d.getHours()).padStart(2, '0');
-                            const minutes = String(d.getMinutes()).padStart(2, '0');
-                            return `${dateStr}, ${hours}:${minutes}`;
-                          } catch {
-                            return '';
-                          }
-                        })()}
-                      </span>
+                      <p className="text-xs font-semibold text-[#2C2825]">{item.name}</p>
+                      {item.relationship && (
+                        <span className="text-[9px] text-[#6E655B] bg-[#EFEAE2] px-1.5 py-0.5 rounded-full">
+                          {item.relationship}
+                        </span>
+                      )}
                     </div>
-
-                    <p className="text-xs text-[#59524A] leading-relaxed pl-8">
-                      {item.message}
-                    </p>
+                    <span className="text-[10px] text-[#8C847B] shrink-0 font-medium">
+                      {(() => {
+                        try {
+                          const d = new Date(item.createdAt);
+                          if (isNaN(d.getTime())) return '';
+                          const dateStr = d.toLocaleDateString('id-ID', {
+                            day: 'numeric',
+                            month: 'short',
+                          });
+                          const hours = String(d.getHours()).padStart(2, '0');
+                          const minutes = String(d.getMinutes()).padStart(2, '0');
+                          return `${dateStr}, ${hours}:${minutes}`;
+                        } catch {
+                          return '';
+                        }
+                      })()}
+                    </span>
                   </div>
-                </ScrollReveal>
+
+                  <p className="text-xs text-[#59524A] leading-relaxed pl-8">
+                    {item.message}
+                  </p>
+                </div>
               ))
             )}
           </div>

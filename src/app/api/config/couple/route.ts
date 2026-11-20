@@ -6,7 +6,7 @@ export const revalidate = 0;
 
 export async function GET() {
   try {
-    const couple = getCouple();
+    const couple = await getCouple();
     return NextResponse.json(
       { success: true, data: couple },
       { headers: { 'Cache-Control': 'no-store, max-age=0' } }
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const updated = saveCouple(body);
+    const updated = await saveCouple(body);
     return NextResponse.json({ success: true, data: updated });
   } catch (error) {
     return NextResponse.json(

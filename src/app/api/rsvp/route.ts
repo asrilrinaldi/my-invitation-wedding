@@ -6,7 +6,7 @@ export const revalidate = 0;
 
 export async function GET() {
   try {
-    const rsvps = getRSVPs();
+    const rsvps = await getRSVPs();
     return NextResponse.json(
       { success: true, data: rsvps },
       { headers: { 'Cache-Control': 'no-store, max-age=0' } }
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'Nama dan status kehadiran wajib diisi' }, { status: 400 });
     }
 
-    const rsvp = saveRSVP(body);
+    const rsvp = await saveRSVP(body);
     return NextResponse.json({ success: true, data: rsvp });
   } catch (error) {
     return NextResponse.json({ success: false, message: 'Failed to save RSVP' }, { status: 500 });

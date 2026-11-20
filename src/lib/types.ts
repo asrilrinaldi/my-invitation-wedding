@@ -6,6 +6,9 @@ export interface Guest {
   phoneNumber?: string;
   customNote?: string;
   hasOpened?: boolean;
+  isCheckedIn?: boolean;
+  checkedInAt?: string;
+  pax?: number;
   createdAt: string;
 }
 

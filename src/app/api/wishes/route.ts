@@ -6,7 +6,7 @@ export const revalidate = 0;
 
 export async function GET() {
   try {
-    const wishes = getWishes();
+    const wishes = await getWishes();
     return NextResponse.json(
       { success: true, data: wishes },
       { headers: { 'Cache-Control': 'no-store, max-age=0' } }
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'Nama dan ucapan wajib diisi' }, { status: 400 });
     }
 
-    const wish = saveWish(body);
+    const wish = await saveWish(body);
     return NextResponse.json({ success: true, data: wish });
   } catch (error) {
     return NextResponse.json({ success: false, message: 'Failed to save wish' }, { status: 500 });
@@ -38,7 +38,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ success: false, message: 'ID ucapan diperlukan' }, { status: 400 });
     }
 
-    const deleted = deleteWish(id);
+    const deleted = await deleteWish(id);
     return NextResponse.json({ success: deleted });
   } catch (error) {
     return NextResponse.json({ success: false, message: 'Failed to delete wish' }, { status: 500 });

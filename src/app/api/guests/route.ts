@@ -6,7 +6,7 @@ export const revalidate = 0;
 
 export async function GET() {
   try {
-    const guests = getGuests();
+    const guests = await getGuests();
     return NextResponse.json(
       { success: true, data: guests },
       { headers: { 'Cache-Control': 'no-store, max-age=0' } }
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'Nama tamu wajib diisi' }, { status: 400 });
     }
 
-    const guest = saveGuest(body);
+    const guest = await saveGuest(body);
     return NextResponse.json({ success: true, data: guest });
   } catch (error) {
     return NextResponse.json({ success: false, message: 'Failed to save guest' }, { status: 500 });
@@ -38,7 +38,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ success: false, message: 'Identifier diperlukan' }, { status: 400 });
     }
 
-    const updated = markGuestOpened(identifier);
+    const updated = await markGuestOpened(identifier);
     return NextResponse.json({ success: true, updated });
   } catch (error) {
     return NextResponse.json({ success: false, message: 'Gagal memperbarui status buka' }, { status: 500 });
@@ -53,7 +53,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ success: false, message: 'ID tamu diperlukan' }, { status: 400 });
     }
 
-    const deleted = deleteGuest(id);
+    const deleted = await deleteGuest(id);
     return NextResponse.json({ success: deleted });
   } catch (error) {
     return NextResponse.json({ success: false, message: 'Failed to delete guest' }, { status: 500 });
