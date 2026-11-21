@@ -69,6 +69,7 @@ create policy "Public Config Policy" on wedding_config for all using (true) with
 -- 6. SEED DATA AWAL (MEMIGRASIKAN DATA LOKAL KE SUPABASE)
 insert into guests (id, name, slug, category, phone_number, custom_note, has_opened, is_checked_in, pax, checked_in_at, created_at)
 values
+  ('gst-testing-001', 'Tamu Testing', 'tamu-testing', 'VIP', '081234567890', 'Tamu khusus untuk pengujian tautan undangan personal', false, false, 2, null, '2026-11-21T10:00:00.000Z'),
   ('gst-1794591459875', 'Sisi Dian Yuriska', 'sisi-dian-yuriska', 'Teman', '08974436879', '', true, true, 1, '2026-11-20T18:10:28.701Z', '2026-11-13T17:37:39.875Z'),
   ('gst-1', 'Bpk. Budi Santoso & Keluarga', 'budi-santoso', 'Keluarga', '081234567890', '', true, false, 3, null, '2026-11-13T15:31:39.124Z'),
   ('gst-2', 'Siti Rahmawati, S.Kom', 'siti-rahmawati', 'Sahabat', '089876543210', '', true, false, 1, null, '2026-11-13T15:31:39.126Z'),
@@ -116,5 +117,15 @@ values
   ('music', '{
     "url": "/music/music001.mp3",
     "title": "Romantic Wedding Melody 01 (Soft Acoustic & Piano)"
+  }'::jsonb),
+  ('event', '{
+    "date": "2027-06-20T08:00:00+07:00",
+    "displayDate": "Minggu, 20 Juni 2027",
+    "akadTime": "08:00 - 10:00 WIB",
+    "resepsiTime": "11:00 - 17:00 WIB",
+    "locationName": "Kediaman Mempelai",
+    "address": "Jalan Dipangga Satya, Gg Mandiri V No.12, Pramuka, Rajabasa, Bandar Lampung",
+    "gmapsUrl": "https://maps.app.goo.gl/FSQsgALZbZJLTy6R7",
+    "gmapsEmbedUrl": "https://maps.google.com/maps?q=Jalan%20Dipangga%20Satya%2C%20Gg%20Mandiri%20V%20No.12%2C%20Pramuka%2C%20Rajabasa%2C%20Bandar%20Lampung&t=&z=16&ie=UTF8&iwloc=&output=embed"
   }'::jsonb)
 on conflict (key) do nothing;

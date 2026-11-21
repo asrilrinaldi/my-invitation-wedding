@@ -1,41 +1,44 @@
-'use client';
-
 import React from 'react';
-import Link from 'next/link';
-import { ShieldAlert, Home, ArrowLeft } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-[#EDE8E1] flex items-center justify-center p-6 text-center select-none">
-      <div className="max-w-md w-full serein-card rounded-3xl p-8 sm:p-10 shadow-2xl space-y-6 animate-fade-in-up border border-[#DDD6CC]">
-        <div className="w-16 h-16 rounded-full bg-[#F5ECE1] border border-[#DDD4C8] text-[#8C7B6B] mx-auto flex items-center justify-center">
-          <ShieldAlert className="w-8 h-8 text-[#8C7B6B]" />
+    <div 
+      className="min-h-screen bg-[#EDE8E1] flex items-center justify-center p-4 sm:p-6 text-center select-none"
+      style={{
+        backgroundImage: "url('/images/paper-grain.png')",
+        backgroundRepeat: 'repeat',
+        backgroundSize: '180px 180px',
+      }}
+    >
+      <div className="max-w-md w-full bg-white/95 backdrop-blur-md rounded-3xl p-8 sm:p-10 shadow-2xl space-y-6 border border-[#DDD6CC] animate-fade-in-up">
+        {/* Monogram Logo */}
+        <div className="flex justify-center items-center">
+          <img
+            src="/logo/logo.PNG"
+            alt="Logo Asril & Sisi"
+            className="h-20 w-auto object-contain brightness-0 opacity-70 pointer-events-none select-none"
+          />
         </div>
 
+        {/* 404 Badge */}
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-[10px] uppercase tracking-wider font-semibold">
+          <AlertCircle className="w-3.5 h-3.5 text-rose-500" />
+          <span>404 • URL Tidak Valid</span>
+        </div>
+
+        {/* Heading & Info */}
         <div className="space-y-2">
-          <p className="text-[11px] uppercase tracking-[0.25em] text-[#8C7B6B] font-medium font-sans">
-            Akses Undangan Terbatas
-          </p>
           <h1 className="text-2xl sm:text-3xl font-serif text-[#2C2825] font-normal">
-            Undangan Tidak Ditemukan
+            Halaman Tidak Ditemukan
           </h1>
           <div className="w-12 h-[1px] bg-[#C4BBB0] mx-auto my-3" />
-          <p className="text-xs text-[#6B635B] leading-relaxed pt-1">
-            Mohon maaf, tautan nama yang Anda akses tidak terdaftar dalam daftar tamu undangan resmi.
+          <p className="text-xs text-[#6B635B] leading-relaxed">
+            Mohon maaf, alamat URL yang Anda tuju tidak valid atau tidak terdaftar dalam sistem undangan pernikahan ini.
           </p>
           <p className="text-[11px] text-[#8C847B] pt-1">
-            Pastikan Anda menggunakan tautan resmi yang dikirimkan langsung oleh kedua mempelai.
+            Pastikan Anda membuka tautan personal resmi yang dikirimkan langsung oleh kedua mempelai.
           </p>
-        </div>
-
-        <div className="pt-4">
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#4A453F] hover:bg-[#38332E] text-white text-xs font-medium tracking-wider uppercase transition-all shadow-md active:scale-95"
-          >
-            <Home className="w-3.5 h-3.5" />
-            <span>Buka Undangan Umum</span>
-          </Link>
         </div>
       </div>
     </div>

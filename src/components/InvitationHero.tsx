@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { weddingConfig } from '@/lib/data';
 import { useCouple } from '@/lib/context/CoupleContext';
+import { useEvent } from '@/lib/context/EventContext';
 
 interface InvitationHeroProps {
   guestName: string;
@@ -27,12 +28,13 @@ export default function InvitationHero({
   isVerified = false,
 }: InvitationHeroProps) {
   const couple = useCouple();
+  const event = useEvent();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [timeLeft, setTimeLeft] = useState({
-    days: 46,
-    hours: 9,
-    minutes: 2,
-    seconds: 58,
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
   });
 
   // Auto-Slideshow effect changing photos smoothly every 4.5 seconds
@@ -44,13 +46,13 @@ export default function InvitationHero({
   }, []);
 
   useEffect(() => {
-    const targetDate = new Date(weddingConfig.event.date).getTime();
+    const targetDate = new Date(event.date).getTime();
 
     const updateCountdown = () => {
       const now = new Date().getTime();
       const difference = targetDate - now;
 
-      if (difference <= 0) {
+      if (difference <= 0 || isNaN(targetDate)) {
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
         return;
       }
@@ -66,7 +68,7 @@ export default function InvitationHero({
     updateCountdown();
     const interval = setInterval(updateCountdown, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [event.date]);
 
   const handleOpen = () => {
     try {
@@ -128,10 +130,23 @@ export default function InvitationHero({
           </h1>
         </div>
 
-        {/* Date (2 lines) - Smaller size, elegant sans-serif */}
+        {/* Date (2 lines) - Smaller size, elegant sans-serif, dynamically loaded */}
         <div className="text-[10px] sm:text-[11px] text-white/85 font-light tracking-[0.15em] uppercase space-y-0.5 font-sans">
-          <p>Minggu</p>
-          <p>20 Juni 2027</p>
+          {event.displayDate ? (
+            event.displayDate.includes(',') ? (
+              <>
+                <p>{event.displayDate.split(',')[0].trim()}</p>
+                <p>{event.displayDate.split(',').slice(1).join(',').trim()}</p>
+              </>
+            ) : (
+              <p>{event.displayDate}</p>
+            )
+          ) : (
+            <>
+              <p>Minggu</p>
+              <p>20 Juni 2027</p>
+            </>
+          )}
         </div>
 
         {/* Before click: "Buka Undangan" Button with Breathing Animation */}

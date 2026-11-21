@@ -4,15 +4,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { 
   Users, CheckCircle, XCircle, MessageSquare, Plus, Trash2, 
-  Copy, Check, ExternalLink, Share2, ArrowLeft, RefreshCw, Eye,
+  Copy, Check, ExternalLink, Share2, ArrowLeft, RefreshCw, Eye, EyeOff,
   Heart, Save, Sparkles, User, ShieldCheck, Music, Play, Pause, Volume2, Camera, QrCode,
-  Download, X
+  Download, X, Calendar, Clock, MapPin, Navigation, Map, Lock, LogOut, KeyRound
 } from 'lucide-react';
 import QRCode from 'qrcode';
 import { Guest, RSVP, Wish, WeddingData, MusicTrackOption } from '@/lib/types';
 import { weddingConfig } from '@/lib/data';
 
 type CoupleConfig = WeddingData['couple'];
+type EventConfig = WeddingData['event'];
 
 // Deterministic unique pass code generator (matches /scan and WeddingPass system)
 function generateGuestCode(name: string): string {
@@ -26,8 +27,55 @@ function generateGuestCode(name: string): string {
   return `AS-${codeNum}`;
 }
 
+// Helper to format ISO date string to YYYY-MM-DD for date input
+function getIsoDateOnly(dateStr: string): string {
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '2027-06-20';
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  } catch {
+    return '2027-06-20';
+  }
+}
+
+// Helper to format ISO date string to HH:mm for time input
+function getIsoTimeOnly(dateStr: string): string {
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '08:00';
+    const hours = String(d.getHours()).padStart(2, '0');
+    const mins = String(d.getMinutes()).padStart(2, '0');
+    return `${hours}:${mins}`;
+  } catch {
+    return '08:00';
+  }
+}
+
+// Helper to format date into Indonesian display text: e.g. "Minggu, 20 Juni 2027"
+function formatIndonesianDate(dateVal: string): string {
+  try {
+    const d = new Date(dateVal);
+    if (isNaN(d.getTime())) return '';
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+    const dayName = days[d.getDay()];
+    const dateNum = d.getDate();
+    const monthName = months[d.getMonth()];
+    const year = d.getFullYear();
+    return `${dayName}, ${dateNum} ${monthName} ${year}`;
+  } catch {
+    return '';
+  }
+}
+
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<'guests' | 'couple' | 'music' | 'rsvp' | 'wishes'>('guests');
+  const [activeTab, setActiveTab] = useState<'guests' | 'couple' | 'event' | 'music' | 'rsvp' | 'wishes'>('guests');
   const [guests, setGuests] = useState<Guest[]>([]);
   const [rsvps, setRsvps] = useState<RSVP[]>([]);
   const [wishes, setWishes] = useState<Wish[]>([]);
@@ -40,6 +88,14 @@ export default function AdminPage() {
     totalAttendingGuests: 0,
     totalWishes: 0,
   });
+
+  // Authentication State
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [loginUsername, setLoginUsername] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [loginError, setLoginError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const [isLoading, setIsLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -54,6 +110,12 @@ export default function AdminPage() {
   const [isSavingCouple, setIsSavingCouple] = useState(false);
   const [coupleSuccessMessage, setCoupleSuccessMessage] = useState('');
   const [coupleErrorMessage, setCoupleErrorMessage] = useState('');
+
+  // Event Config State
+  const [eventForm, setEventForm] = useState<EventConfig>(weddingConfig.event);
+  const [isSavingEvent, setIsSavingEvent] = useState(false);
+  const [eventSuccessMessage, setEventSuccessMessage] = useState('');
+  const [eventErrorMessage, setEventErrorMessage] = useState('');
 
   // Music Config State
   const [musicForm, setMusicForm] = useState({
@@ -76,25 +138,89 @@ export default function AdminPage() {
   const [newGuestPhone, setNewGuestPhone] = useState('');
   const [isSubmittingGuest, setIsSubmittingGuest] = useState(false);
 
+  const checkAuth = async () => {
+    try {
+      const res = await fetch('/api/auth/check');
+      const data = await res.json();
+      const authed = Boolean(data.authenticated);
+      setIsAuthenticated(authed);
+      if (authed) {
+        fetchData();
+      } else {
+        setIsLoading(false);
+      }
+    } catch (err) {
+      setIsAuthenticated(false);
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoggingIn(true);
+    setLoginError('');
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: loginUsername,
+          password: loginPassword,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setIsAuthenticated(true);
+        setLoginUsername('');
+        setLoginPassword('');
+        fetchData();
+      } else {
+        setLoginError(data.message || 'Username atau kata sandi salah.');
+      }
+    } catch (err) {
+      setLoginError('Terjadi kesalahan jaringan.');
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      setIsAuthenticated(false);
+    }
+  };
+
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const [guestsRes, rsvpsRes, wishesRes, statsRes, coupleRes, musicRes] = await Promise.all([
+      const [guestsRes, rsvpsRes, wishesRes, statsRes, coupleRes, musicRes, eventRes] = await Promise.all([
         fetch('/api/guests', { cache: 'no-store' }),
         fetch('/api/rsvp', { cache: 'no-store' }),
         fetch('/api/wishes', { cache: 'no-store' }),
         fetch('/api/stats', { cache: 'no-store' }),
         fetch('/api/config/couple', { cache: 'no-store' }),
         fetch('/api/config/music', { cache: 'no-store' }),
+        fetch('/api/config/event', { cache: 'no-store' }),
       ]);
 
-      const [guestsData, rsvpsData, wishesData, statsData, coupleData, musicData] = await Promise.all([
+      const [guestsData, rsvpsData, wishesData, statsData, coupleData, musicData, eventData] = await Promise.all([
         guestsRes.json(),
         rsvpsRes.json(),
         wishesRes.json(),
         statsRes.json(),
         coupleRes.json(),
         musicRes.json(),
+        eventRes.json(),
       ]);
 
       if (guestsData.success) setGuests(guestsData.data);
@@ -105,6 +231,9 @@ export default function AdminPage() {
       if (musicData.success && musicData.data) {
         setMusicForm(musicData.data);
         if (musicData.options) setMusicOptions(musicData.options);
+      }
+      if (eventData.success && eventData.data) {
+        setEventForm(eventData.data);
       }
     } catch (err) {
       console.error('Error fetching admin data:', err);
@@ -139,6 +268,56 @@ export default function AdminPage() {
     } finally {
       setIsSavingCouple(false);
     }
+  };
+
+  const handleSaveEvent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingEvent(true);
+    setEventSuccessMessage('');
+    setEventErrorMessage('');
+
+    try {
+      const res = await fetch('/api/config/event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(eventForm),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setEventSuccessMessage('Tanggal dan rangkaian acara pernikahan berhasil diperbarui!');
+        setTimeout(() => setEventSuccessMessage(''), 4500);
+        fetchData();
+      } else {
+        setEventErrorMessage(data.message || 'Gagal menyimpan data acara pernikahan.');
+      }
+    } catch (err) {
+      setEventErrorMessage('Terjadi kesalahan jaringan.');
+    } finally {
+      setIsSavingEvent(false);
+    }
+  };
+
+  const handleDateChange = (dateVal: string) => {
+    if (!dateVal) return;
+    const timeVal = getIsoTimeOnly(eventForm.date);
+    const newIso = `${dateVal}T${timeVal}:00+07:00`;
+    const formatted = formatIndonesianDate(dateVal);
+    setEventForm(prev => ({
+      ...prev,
+      date: newIso,
+      displayDate: formatted || prev.displayDate,
+    }));
+  };
+
+  const handleTimeChange = (timeVal: string) => {
+    if (!timeVal) return;
+    const dateVal = getIsoDateOnly(eventForm.date);
+    const newIso = `${dateVal}T${timeVal}:00+07:00`;
+    setEventForm(prev => ({
+      ...prev,
+      date: newIso,
+    }));
   };
 
   const handleSaveMusic = async (e: React.FormEvent) => {
@@ -194,10 +373,6 @@ export default function AdminPage() {
         .catch((err) => console.error('Audio play error:', err));
     }
   };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   const handleAddGuest = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -261,6 +436,13 @@ export default function AdminPage() {
 
   const getWhatsAppMessage = (guest: Guest) => {
     const link = getInvitationUrl(guest);
+    const groomFull = coupleForm.groom?.fullName || weddingConfig.couple.groom.fullName;
+    const brideFull = coupleForm.bride?.fullName || weddingConfig.couple.bride.fullName;
+    const groomNick = coupleForm.groom?.nickname || weddingConfig.couple.groom.nickname;
+    const brideNick = coupleForm.bride?.nickname || weddingConfig.couple.bride.nickname;
+    const eventDate = eventForm.displayDate || weddingConfig.event.displayDate;
+    const eventLoc = eventForm.locationName || weddingConfig.event.locationName;
+
     return `Kepada Yth.
 Bapak/Ibu/Saudara/i *${guest.name}*
 
@@ -268,9 +450,9 @@ _Assalamu'alaikum Warahmatullahi Wabarakatuh_
 
 Tanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk berkenan menghadiri hari bahagia pernikahan kami:
 
-💍 *${weddingConfig.couple.groom.fullName} & ${weddingConfig.couple.bride.fullName}*
-🗓️ *${weddingConfig.event.displayDate}*
-📍 *${weddingConfig.event.locationName}, Bandar Lampung*
+💍 *${groomFull} & ${brideFull}*
+🗓️ *${eventDate}*
+📍 *${eventLoc}, Bandar Lampung*
 
 Detail acara, QR Pass, dan konfirmasi kehadiran dapat diakses melalui tautan undangan berikut:
 ${link}
@@ -281,7 +463,7 @@ Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i
 
 _Wassalamu'alaikum Warahmatullahi Wabarakatuh_
 Hormat kami yang berbahagia,
-*${weddingConfig.couple.groom.nickname} & ${weddingConfig.couple.bride.nickname}*`;
+*${groomNick} & ${brideNick}*`;
   };
 
   const copyLink = (guest: Guest) => {
@@ -336,23 +518,141 @@ Hormat kami yang berbahagia,
     setTimeout(() => setIsCopiedCode(false), 2000);
   };
 
+  // 1. Loading screen while verifying credentials
+  if (isAuthenticated === null) {
+    return (
+      <div 
+        className="min-h-screen bg-[#EDE8E1] flex items-center justify-center p-6 text-center select-none"
+        style={{
+          backgroundImage: "url('/images/paper-grain.png')",
+          backgroundRepeat: 'repeat',
+          backgroundSize: '180px 180px',
+        }}
+      >
+        <div className="flex flex-col items-center gap-3 bg-white/85 backdrop-blur-md p-8 rounded-3xl border border-[#DDD6CC] shadow-md animate-fade-in">
+          <RefreshCw className="w-7 h-7 text-[#846030] animate-spin" />
+          <p className="text-xs font-serif text-[#59524A] tracking-wider uppercase">Memeriksa Kredensial Akses...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Login screen if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div 
+        className="min-h-screen bg-[#EDE8E1] flex items-center justify-center p-4 sm:p-6 select-none"
+        style={{
+          backgroundImage: "url('/images/paper-grain.png')",
+          backgroundRepeat: 'repeat',
+          backgroundSize: '180px 180px',
+        }}
+      >
+        <div className="max-w-md w-full bg-white/95 backdrop-blur-md rounded-3xl p-7 sm:p-9 shadow-2xl space-y-6 border border-[#DDD6CC] animate-fade-in-up">
+          {/* Logo & Header */}
+          <div className="text-center space-y-3">
+            <div className="flex justify-center items-center py-1">
+              <img
+                src="/logo/logo.PNG"
+                alt="Logo Asril & Sisi"
+                className="h-20 w-auto object-contain brightness-0 opacity-80 pointer-events-none select-none"
+              />
+            </div>
+
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F5ECE1] border border-[#DDD4C8] text-[#8C7B6B] text-[10px] uppercase tracking-wider font-semibold">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#8C7B6B]" />
+              <span>Akses Khusus Pengantin &amp; Admin</span>
+            </div>
+
+            <h1 className="text-2xl font-serif font-bold text-[#2C2825]">
+              Login Dashboard
+            </h1>
+            <p className="text-xs text-[#7E776F] leading-relaxed">
+              Halaman ini dilindungi. Masukkan kredensial admin untuk mengelola daftar tamu, tanggal pernikahan, musik, dan konfirmasi kehadiran.
+            </p>
+          </div>
+
+          {/* Login Error Notification */}
+          {loginError && (
+            <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2 animate-fade-in font-medium">
+              <XCircle className="w-4 h-4 text-rose-500 shrink-0" />
+              <span>{loginError}</span>
+            </div>
+          )}
+
+          {/* Login Form */}
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="text-[11px] font-semibold text-[#4A453F] block mb-1">
+                Username Admin
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8C7B6B]">
+                  <User className="w-4 h-4" />
+                </div>
+                <input
+                  type="text"
+                  value={loginUsername}
+                  onChange={(e) => setLoginUsername(e.target.value)}
+                  placeholder="Masukkan username"
+                  required
+                  autoFocus
+                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#DDD6CC] text-[#2C2825] placeholder-[#A3988C] text-xs focus:outline-none focus:border-[#C5A880] transition-colors"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-[11px] font-semibold text-[#4A453F] block mb-1">
+                Kata Sandi (Password)
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8C7B6B]">
+                  <Lock className="w-4 h-4" />
+                </div>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="Masukkan kata sandi"
+                  required
+                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#DDD6CC] text-[#2C2825] placeholder-[#A3988C] text-xs focus:outline-none focus:border-[#C5A880] transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#8C7B6B] hover:text-[#4A453F] transition-colors cursor-pointer"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoggingIn}
+              className="w-full py-3 rounded-xl bg-[#4A453F] hover:bg-[#34302C] text-white font-semibold text-xs tracking-wider uppercase transition-all shadow-md active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer mt-2"
+            >
+              <KeyRound className="w-4 h-4 text-amber-300" />
+              <span>{isLoggingIn ? 'Memverifikasi...' : 'Masuk ke Dashboard'}</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-[#2C2825] p-4 sm:p-8 font-sans">
       {/* Top Header */}
       <div className="max-w-6xl mx-auto mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E8E2D8] pb-6">
         <div>
-          <Link 
-            href="/" 
-            className="inline-flex items-center gap-2 text-xs text-[#8C7B6B] hover:text-[#4A453F] mb-2 font-medium transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Lihat Halaman Undangan</span>
-          </Link>
           <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#2C2825]">
             Dashboard Pengantin
           </h1>
           <p className="text-xs text-[#7E776F]">
-            Pernikahan {weddingConfig.couple.groom.nickname} &amp; {weddingConfig.couple.bride.nickname} • 20 Juni 2027
+            Pernikahan {coupleForm.groom?.nickname || weddingConfig.couple.groom.nickname} &amp; {coupleForm.bride?.nickname || weddingConfig.couple.bride.nickname} • {eventForm.displayDate || weddingConfig.event.displayDate}
           </p>
         </div>
 
@@ -372,6 +672,15 @@ Hormat kami yang berbahagia,
           >
             <RefreshCw className={`w-3.5 h-3.5 text-[#846030] ${isLoading ? 'animate-spin' : ''}`} />
             <span>Segarkan Data</span>
+          </button>
+
+          <button
+            onClick={handleLogout}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white hover:bg-rose-50 text-rose-700 hover:text-rose-800 text-xs font-semibold border border-rose-200 shadow-2xs transition-all w-fit cursor-pointer"
+            title="Keluar dari sesi dashboard"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Keluar</span>
           </button>
         </div>
       </div>
@@ -455,6 +764,17 @@ Hormat kami yang berbahagia,
           >
             <Heart className="w-3.5 h-3.5 text-rose-500" />
             <span>Data Pengantin &amp; Orang Tua</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('event')}
+            className={`pb-3 px-4 text-xs font-semibold tracking-wider uppercase transition-colors border-b-2 flex items-center gap-2 shrink-0 cursor-pointer ${
+              activeTab === 'event'
+                ? 'border-[#4A453F] text-[#2C2825]'
+                : 'border-transparent text-[#7E776F] hover:text-[#2C2825]'
+            }`}
+          >
+            <Calendar className="w-3.5 h-3.5 text-amber-700" />
+            <span>Tanggal &amp; Lokasi Acara</span>
           </button>
           <button
             onClick={() => setActiveTab('music')}
@@ -911,6 +1231,313 @@ Hormat kami yang berbahagia,
               >
                 <Save className="w-4 h-4" />
                 <span>{isSavingCouple ? 'Menyimpan Perubahan...' : 'Simpan Data Pengantin & Orang Tua'}</span>
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* TAB: WEDDING DATE & EVENT CONFIGURATION */}
+        {activeTab === 'event' && (
+          <form onSubmit={handleSaveEvent} className="space-y-6 animate-fade-in">
+            {/* Header info */}
+            <div className="bg-white rounded-2xl p-6 sm:p-7 border border-[#E5E0D8] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-[#2C2825] font-semibold text-base sm:text-lg">
+                  <Calendar className="w-5 h-5 text-[#846030]" />
+                  <span>Pengaturan Tanggal &amp; Rangkaian Acara Pernikahan</span>
+                </div>
+                <p className="text-xs text-[#7E776F]">
+                  Atur tanggal hari pernikahan, waktu akad &amp; resepsi, serta lokasi acara yang tampil di seluruh halaman undangan dan pesan WhatsApp.
+                </p>
+              </div>
+
+              {/* Status Badge */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-xs shrink-0 font-medium">
+                <Clock className="w-3.5 h-3.5 text-[#846030]" />
+                <span>Target: <strong className="font-semibold text-[#2C2825]">{eventForm.displayDate || '20 Juni 2027'}</strong></span>
+              </div>
+            </div>
+
+            {/* Notification messages */}
+            {eventSuccessMessage && (
+              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2 animate-fade-in font-medium">
+                <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{eventSuccessMessage}</span>
+              </div>
+            )}
+
+            {eventErrorMessage && (
+              <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2 animate-fade-in font-medium">
+                <XCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                <span>{eventErrorMessage}</span>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Card 1: Tanggal & Waktu Acara */}
+              <div className="bg-white rounded-2xl p-6 sm:p-7 border border-[#E5E0D8] shadow-xs space-y-4">
+                <div className="flex items-center gap-2.5 pb-3 border-b border-[#E8E2D8]">
+                  <div className="w-9 h-9 rounded-full bg-[#F3EFEA] border border-[#E0D8CE] flex items-center justify-center text-[#846030]">
+                    <Calendar className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-serif font-bold text-[#2C2825]">
+                      Tanggal Pernikahan &amp; Countdown
+                    </h3>
+                    <p className="text-[10px] text-[#7E776F]">
+                      Target hitung mundur waktu dan format tanggal tampilan
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {/* Tanggal & Jam Picker */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[11px] text-[#4A453F] block mb-1 font-medium">
+                        Pilih Tanggal Acara (Kalender)
+                      </label>
+                      <input
+                        type="date"
+                        value={getIsoDateOnly(eventForm.date)}
+                        onChange={(e) => handleDateChange(e.target.value)}
+                        required
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#DDD6CC] text-[#2C2825] text-xs focus:outline-none focus:border-[#C5A880] transition-colors"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[11px] text-[#4A453F] block mb-1 font-medium">
+                        Jam Mulai (Target Countdown)
+                      </label>
+                      <input
+                        type="time"
+                        value={getIsoTimeOnly(eventForm.date)}
+                        onChange={(e) => handleTimeChange(e.target.value)}
+                        required
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#DDD6CC] text-[#2C2825] text-xs focus:outline-none focus:border-[#C5A880] transition-colors"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Countdown Status Badge */}
+                  <div className="p-3 rounded-xl bg-[#FAF8F5] border border-[#E8E2D8] text-[11px] flex items-center gap-2">
+                    <Clock className="w-3.5 h-3.5 text-[#846030] shrink-0" />
+                    <span className="text-[#59524A]">
+                      {(() => {
+                        const target = new Date(eventForm.date).getTime();
+                        const diff = target - Date.now();
+                        if (isNaN(target)) return 'Format tanggal belum valid';
+                        if (diff <= 0) return 'Hari pernikahan telah tiba / telah terlewati';
+                        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        return `Status Countdown: Tersisa ${d} Hari ${h} Jam ${m} Menit`;
+                      })()}
+                    </span>
+                  </div>
+
+                  {/* Teks Format Tanggal Tampilan */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-[11px] text-[#4A453F] font-medium">
+                        Teks Tanggal Tampilan Undangan
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const dateOnly = getIsoDateOnly(eventForm.date);
+                          const formatted = formatIndonesianDate(dateOnly);
+                          if (formatted) {
+                            setEventForm(prev => ({ ...prev, displayDate: formatted }));
+                          }
+                        }}
+                        className="text-[10px] text-[#846030] hover:text-[#5C421E] font-medium flex items-center gap-1 cursor-pointer transition-colors"
+                        title="Klik untuk membuat format bahasa Indonesia otomatis sesuai kalender di atas"
+                      >
+                        <Sparkles className="w-3 h-3" />
+                        <span>Format Otomatis Kalender</span>
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      value={eventForm.displayDate}
+                      onChange={(e) => setEventForm({ ...eventForm, displayDate: e.target.value })}
+                      placeholder="Contoh: Minggu, 20 Juni 2027"
+                      required
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#DDD6CC] text-[#2C2825] placeholder-[#A3988C] text-xs focus:outline-none focus:border-[#C5A880] transition-colors"
+                    />
+                    <p className="text-[10px] text-[#7E776F] mt-1">
+                      Teks ini ditampilkan pada sampul utama, judul acara, teks WhatsApp, dan detail rangkaian acara.
+                    </p>
+                  </div>
+
+                  {/* Jam Akad & Resepsi */}
+                  <div className="pt-2 border-t border-[#EFEAE2] space-y-3">
+                    <p className="text-[10px] uppercase tracking-wider text-[#846030] font-semibold">
+                      Waktu Pelaksanaan Sesi:
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-[11px] text-[#4A453F] block mb-1">
+                          Waktu Akad Nikah
+                        </label>
+                        <input
+                          type="text"
+                          value={eventForm.akadTime}
+                          onChange={(e) => setEventForm({ ...eventForm, akadTime: e.target.value })}
+                          placeholder="Contoh: 08:00 - 10:00 WIB"
+                          required
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#DDD6CC] text-[#2C2825] placeholder-[#A3988C] text-xs focus:outline-none focus:border-[#C5A880] transition-colors"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[11px] text-[#4A453F] block mb-1">
+                          Waktu Resepsi Pernikahan
+                        </label>
+                        <input
+                          type="text"
+                          value={eventForm.resepsiTime}
+                          onChange={(e) => setEventForm({ ...eventForm, resepsiTime: e.target.value })}
+                          placeholder="Contoh: 11:00 - 17:00 WIB"
+                          required
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#DDD6CC] text-[#2C2825] placeholder-[#A3988C] text-xs focus:outline-none focus:border-[#C5A880] transition-colors"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 2: Lokasi & Alamat Acara */}
+              <div className="bg-white rounded-2xl p-6 sm:p-7 border border-[#E5E0D8] shadow-xs space-y-4">
+                <div className="flex items-center gap-2.5 pb-3 border-b border-[#E8E2D8]">
+                  <div className="w-9 h-9 rounded-full bg-[#F3EFEA] border border-[#E0D8CE] flex items-center justify-center text-[#846030]">
+                    <MapPin className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-serif font-bold text-[#2C2825]">
+                      Lokasi &amp; Tautan Peta
+                    </h3>
+                    <p className="text-[10px] text-[#7E776F]">
+                      Tempat pelaksanaan dan petunjuk navigasi Google Maps
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-3.5">
+                  <div>
+                    <label className="text-[11px] text-[#4A453F] block mb-1 font-medium">
+                      Nama Lokasi / Tempat Acara
+                    </label>
+                    <input
+                      type="text"
+                      value={eventForm.locationName}
+                      onChange={(e) => setEventForm({ ...eventForm, locationName: e.target.value })}
+                      placeholder="Contoh: Kediaman Mempelai / Gedung Serbaguna"
+                      required
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#DDD6CC] text-[#2C2825] placeholder-[#A3988C] text-xs focus:outline-none focus:border-[#C5A880] transition-colors"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] text-[#4A453F] block mb-1 font-medium">
+                      Alamat Lengkap
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={eventForm.address}
+                      onChange={(e) => setEventForm({ ...eventForm, address: e.target.value })}
+                      placeholder="Jalan, No Rumah, Kelurahan, Kecamatan, Kota / Kabupaten..."
+                      required
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#DDD6CC] text-[#2C2825] placeholder-[#A3988C] text-xs focus:outline-none focus:border-[#C5A880] transition-colors resize-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] text-[#4A453F] block mb-1 font-medium">
+                      Tautan Google Maps (Navigasi Tamu)
+                    </label>
+                    <input
+                      type="url"
+                      value={eventForm.gmapsUrl}
+                      onChange={(e) => setEventForm({ ...eventForm, gmapsUrl: e.target.value })}
+                      placeholder="Contoh: https://maps.app.goo.gl/..."
+                      required
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#DDD6CC] text-[#2C2825] placeholder-[#A3988C] text-xs focus:outline-none focus:border-[#C5A880] transition-colors"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] text-[#4A453F] block mb-1">
+                      Tautan Embed Google Maps (Iframe Peta, Opsional)
+                    </label>
+                    <input
+                      type="text"
+                      value={eventForm.gmapsEmbedUrl || ''}
+                      onChange={(e) => setEventForm({ ...eventForm, gmapsEmbedUrl: e.target.value })}
+                      placeholder="Contoh: https://maps.google.com/maps?q=...&output=embed"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#DDD6CC] text-[#2C2825] placeholder-[#A3988C] text-xs focus:outline-none focus:border-[#C5A880] transition-colors"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Live Preview Card */}
+            <div className="bg-white rounded-2xl p-6 sm:p-7 border border-[#E5E0D8] shadow-xs space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-[#E8E2D8]">
+                <div className="flex items-center gap-2">
+                  <Eye className="w-4 h-4 text-[#846030]" />
+                  <h3 className="text-sm font-serif font-bold text-[#2C2825]">
+                    Pratinjau Tampilan Rangkaian Acara di Undangan
+                  </h3>
+                </div>
+                <span className="text-[10px] text-[#7E776F]">Tampilan Langsung</span>
+              </div>
+
+              <div className="p-6 rounded-2xl bg-[#F5F1EB] border border-[#E5DFD6] space-y-4 max-w-xl mx-auto text-center">
+                <p className="text-[11px] uppercase tracking-[0.25em] text-[#8C7B6B] font-medium">
+                  Rangkaian Acara
+                </p>
+                <h4 className="text-xl font-serif font-semibold text-[#2C2825]">
+                  {eventForm.displayDate || 'Minggu, 20 Juni 2027'}
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                  {/* Akad Nikah Preview */}
+                  <div className="p-4 rounded-xl bg-white border border-[#DDD6CC] shadow-2xs space-y-1">
+                    <p className="font-serif font-bold text-sm text-[#2C2825]">Akad Nikah</p>
+                    <p className="text-xs text-[#846030] font-medium">{eventForm.akadTime || '08:00 - 10:00 WIB'}</p>
+                    <p className="text-[11px] text-[#7A7167]">{eventForm.locationName || 'Kediaman Mempelai'}</p>
+                  </div>
+
+                  {/* Resepsi Preview */}
+                  <div className="p-4 rounded-xl bg-white border border-[#DDD6CC] shadow-2xs space-y-1">
+                    <p className="font-serif font-bold text-sm text-[#2C2825]">Resepsi Pernikahan</p>
+                    <p className="text-xs text-[#846030] font-medium">{eventForm.resepsiTime || '11:00 - 17:00 WIB'}</p>
+                    <p className="text-[11px] text-[#7A7167]">{eventForm.locationName || 'Kediaman Mempelai'}</p>
+                  </div>
+                </div>
+
+                <div className="pt-2 text-[11px] text-[#6B635B] space-y-1">
+                  <p className="font-medium text-[#2C2825]">{eventForm.locationName}</p>
+                  <p className="text-[10.5px] line-clamp-2">{eventForm.address}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Save Button */}
+            <div className="pt-2 flex justify-end">
+              <button
+                type="submit"
+                disabled={isSavingEvent}
+                className="px-8 py-3 rounded-xl bg-[#4A453F] hover:bg-[#34302C] text-white font-semibold text-xs tracking-wider uppercase transition-all shadow-md active:scale-95 disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+              >
+                <Save className="w-4 h-4" />
+                <span>{isSavingEvent ? 'Menyimpan Tanggal & Acara...' : 'Simpan Tanggal & Lokasi Acara'}</span>
               </button>
             </div>
           </form>

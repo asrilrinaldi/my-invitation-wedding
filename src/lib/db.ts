@@ -10,6 +10,7 @@ interface DatabaseSchema {
   wishes: Wish[];
   couple?: WeddingData['couple'];
   music?: WeddingData['music'];
+  event?: WeddingData['event'];
 }
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -17,6 +18,17 @@ const DB_FILE = path.join(DATA_DIR, 'wedding-data.json');
 
 const INITIAL_DATA: DatabaseSchema = {
   guests: [
+    {
+      id: "gst-testing-001",
+      name: "Tamu Testing",
+      slug: "tamu-testing",
+      category: "VIP",
+      phoneNumber: "081234567890",
+      customNote: "Tamu khusus untuk pengujian tautan undangan personal",
+      hasOpened: false,
+      pax: 2,
+      createdAt: new Date().toISOString(),
+    },
     {
       id: "gst-1",
       name: "Bpk. Budi Santoso & Keluarga",
@@ -910,6 +922,61 @@ export async function saveMusic(
   local.music = updated;
   writeData(local);
   return updated;
+}
+
+export async function getEvent(): Promise<WeddingData['event']> {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('wedding_config')
+        .select('value')
+        .eq('key', 'event')
+        .maybeSingle();
+
+      if (data && data.value) {
+        return {
+          ...weddingConfig.event,
+          ...data.value,
+        };
+      }
+    } catch (err) {
+      console.error('Supabase getEvent exception:', err);
+    }
+  }
+
+  const local = readData();
+  if (local.event) {
+    return {
+      ...weddingConfig.event,
+      ...local.event,
+    };
+  }
+  return weddingConfig.event;
+}
+
+export async function saveEvent(
+  eventData: Partial<WeddingData['event']>
+): Promise<WeddingData['event']> {
+  const current = await getEvent();
+  const merged: WeddingData['event'] = {
+    ...current,
+    ...eventData,
+  };
+
+  if (isSupabaseConfigured && supabase) {
+    try {
+      await supabase
+        .from('wedding_config')
+        .upsert({ key: 'event', value: merged, updated_at: new Date().toISOString() });
+    } catch (err) {
+      console.error('Supabase saveEvent exception:', err);
+    }
+  }
+
+  const local = readData();
+  local.event = merged;
+  writeData(local);
+  return merged;
 }
 
 export function getAvailableMusicTracks(): {

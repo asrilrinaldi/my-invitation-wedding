@@ -1,6 +1,17 @@
 {
   "guests": [
     {
+      "id": "gst-testing-001",
+      "name": "Tamu Testing",
+      "slug": "tamu-testing",
+      "category": "VIP",
+      "phoneNumber": "081234567890",
+      "customNote": "Tamu khusus untuk pengujian tautan undangan personal",
+      "hasOpened": true,
+      "pax": 2,
+      "createdAt": "2026-11-21T10:00:00.000Z"
+    },
+    {
       "id": "gst-1795199430603",
       "name": "test 1",
       "slug": "test-1",
@@ -145,5 +156,15 @@
   "music": {
     "url": "/music/music001.mp3",
     "title": "Romantic Wedding Melody 01 (Soft Acoustic & Piano)"
+  },
+  "event": {
+    "date": "2027-06-01T08:00:00+07:00",
+    "displayDate": "Selasa, 1 Juni 2027",
+    "akadTime": "08:00 - 10:00 WIB",
+    "resepsiTime": "11:00 - 17:00 WIB",
+    "locationName": "Kediaman Mempelai",
+    "address": "Jalan Dipangga Satya, Gg Mandiri V No.12, Pramuka, Rajabasa, Bandar Lampung",
+    "gmapsUrl": "https://maps.app.goo.gl/FSQsgALZbZJLTy6R7",
+    "gmapsEmbedUrl": "https://maps.google.com/maps?q=Jalan%20Dipangga%20Satya%2C%20Gg%20Mandiri%20V%20No.12%2C%20Pramuka%2C%20Rajabasa%2C%20Bandar%20Lampung&t=&z=16&ie=UTF8&iwloc=&output=embed"
   }
 }

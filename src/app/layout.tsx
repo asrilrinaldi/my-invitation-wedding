@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { CoupleProvider } from "@/lib/context/CoupleContext";
+import { EventProvider } from "@/lib/context/EventContext";
 import { MusicProvider } from "@/lib/context/MusicContext";
 
 export const viewport: Viewport = {
@@ -48,9 +49,11 @@ export default function RootLayout({
     <html lang="id">
       <body className="antialiased selection:bg-[#B5AAA0] selection:text-black bg-[#EDE8E1]">
         <CoupleProvider>
-          <MusicProvider>
-            {children}
-          </MusicProvider>
+          <EventProvider>
+            <MusicProvider>
+              {children}
+            </MusicProvider>
+          </EventProvider>
         </CoupleProvider>
       </body>
     </html>

@@ -3,8 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, MapPin } from 'lucide-react';
 import { weddingConfig } from '@/lib/data';
+import { useCouple } from '@/lib/context/CoupleContext';
+import { useEvent } from '@/lib/context/EventContext';
 
 export default function HeroSection() {
+  const couple = useCouple();
+  const event = useEvent();
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -13,13 +17,13 @@ export default function HeroSection() {
   });
 
   useEffect(() => {
-    const targetDate = new Date(weddingConfig.event.date).getTime();
+    const targetDate = new Date(event.date).getTime();
 
     const updateCountdown = () => {
       const now = new Date().getTime();
       const difference = targetDate - now;
 
-      if (difference <= 0) {
+      if (difference <= 0 || isNaN(targetDate)) {
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
         return;
       }
@@ -35,14 +39,22 @@ export default function HeroSection() {
     updateCountdown();
     const interval = setInterval(updateCountdown, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [event.date]);
 
   const handleAddToCalendar = () => {
-    const title = encodeURIComponent(`The Wedding of ${weddingConfig.couple.groom.nickname} & ${weddingConfig.couple.bride.nickname}`);
-    const details = encodeURIComponent(`Pernikahan ${weddingConfig.couple.groom.fullName} & ${weddingConfig.couple.bride.fullName}.\nLokasi: ${weddingConfig.event.address}`);
-    const location = encodeURIComponent(weddingConfig.event.address);
-    // 2027-06-20 08:00 WIB to 17:00 WIB -> UTC is 01:00 to 10:00 (WIB = UTC+7)
-    const dates = '20270620T010000Z/20270620T100000Z';
+    const title = encodeURIComponent(`The Wedding of ${couple.groom.nickname} & ${couple.bride.nickname}`);
+    const details = encodeURIComponent(`Pernikahan ${couple.groom.fullName} & ${couple.bride.fullName}.\nLokasi: ${event.address}`);
+    const location = encodeURIComponent(event.address);
+    let dates = '20270620T010000Z/20270620T100000Z';
+    try {
+      const d = new Date(event.date);
+      if (!isNaN(d.getTime())) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        dates = `${y}${m}${day}T010000Z/${y}${m}${day}T100000Z`;
+      }
+    } catch {}
     const gCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${details}&location=${location}`;
     window.open(gCalUrl, '_blank');
   };
@@ -72,10 +84,10 @@ export default function HeroSection() {
         {/* Names */}
         <div className="space-y-2">
           <h1 className="text-5xl sm:text-7xl font-serif text-gold-gradient font-bold tracking-tight">
-            {weddingConfig.couple.groom.nickname} &amp; {weddingConfig.couple.bride.nickname}
+            {couple.groom.nickname} &amp; {couple.bride.nickname}
           </h1>
           <p className="font-serif italic text-gold-200/80 text-lg sm:text-xl">
-            {weddingConfig.couple.groom.fullName} &amp; {weddingConfig.couple.bride.fullName}
+            {couple.groom.fullName} &amp; {couple.bride.fullName}
           </p>
         </div>
 
@@ -83,11 +95,11 @@ export default function HeroSection() {
         <div className="flex flex-wrap items-center justify-center gap-4 text-xs sm:text-sm text-gray-300 pt-2">
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-gold-500/20 backdrop-blur-sm">
             <Calendar className="w-3.5 h-3.5 text-gold-400" />
-            <span>{weddingConfig.event.displayDate}</span>
+            <span>{event.displayDate}</span>
           </div>
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-gold-500/20 backdrop-blur-sm">
             <MapPin className="w-3.5 h-3.5 text-gold-400" />
-            <span>Bandar Lampung</span>
+            <span>{event.locationName || 'Bandar Lampung'}</span>
           </div>
         </div>
 

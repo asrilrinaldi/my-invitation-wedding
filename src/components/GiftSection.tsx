@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Gift, Copy, Check, QrCode, X, Download, CreditCard, Building2 } from 'lucide-react';
 import { weddingConfig } from '@/lib/data';
+import { useEvent } from '@/lib/context/EventContext';
 import ScrollReveal from './ScrollReveal';
 import SectionDivider from './SectionDivider';
 
@@ -13,7 +14,8 @@ export default function GiftSection() {
   const [copiedBank, setCopiedBank] = useState(false);
   const [copiedAddress, setCopiedAddress] = useState(false);
   const [showQrisModal, setShowQrisModal] = useState(false);
-  const { bank, event } = weddingConfig;
+  const { bank } = weddingConfig;
+  const event = useEvent();
 
   const handleCopyBank = () => {
     navigator.clipboard.writeText(bank.accountNumber);

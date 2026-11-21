@@ -4,11 +4,12 @@ import React, { useState } from 'react';
 import { Calendar, Clock, Navigation, ExternalLink, MapPin, Copy, Check, CalendarPlus, X, Download } from 'lucide-react';
 import { weddingConfig } from '@/lib/data';
 import { useCouple } from '@/lib/context/CoupleContext';
+import { useEvent } from '@/lib/context/EventContext';
 import ScrollReveal from './ScrollReveal';
 import SectionDivider from './SectionDivider';
 
 export default function EventSection() {
-  const { event } = weddingConfig;
+  const event = useEvent();
   const couple = useCouple();
   const [copied, setCopied] = useState(false);
   const [calendarModal, setCalendarModal] = useState<{
@@ -36,14 +37,35 @@ export default function EventSection() {
     }
   };
 
+  const getCalendarIsoDates = (dateStr: string, isAkad: boolean) => {
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) {
+        return isAkad 
+          ? { start: '20270620T010000Z', end: '20270620T030000Z' }
+          : { start: '20270620T040000Z', end: '20270620T100000Z' };
+      }
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const datePrefix = `${y}${m}${day}`;
+
+      const start = isAkad ? `${datePrefix}T010000Z` : `${datePrefix}T040000Z`;
+      const end = isAkad ? `${datePrefix}T030000Z` : `${datePrefix}T100000Z`;
+      return { start, end };
+    } catch {
+      return isAkad 
+        ? { start: '20270620T010000Z', end: '20270620T030000Z' }
+        : { start: '20270620T040000Z', end: '20270620T100000Z' };
+    }
+  };
+
   const getGoogleCalendarUrl = (type: 'akad' | 'resepsi') => {
     const isAkad = type === 'akad';
     const title = isAkad
       ? `Akad Nikah ${couple.groom.nickname} & ${couple.bride.nickname}`
       : `Resepsi Pernikahan ${couple.groom.nickname} & ${couple.bride.nickname}`;
-    // 2027-06-20: Akad 08:00-10:00 WIB (UTC: 01:00-03:00), Resepsi 11:00-17:00 WIB (UTC: 04:00-10:00)
-    const start = isAkad ? '20270620T010000Z' : '20270620T040000Z';
-    const end = isAkad ? '20270620T030000Z' : '20270620T100000Z';
+    const { start, end } = getCalendarIsoDates(event.date, isAkad);
     const details = `${title}\nPukul: ${isAkad ? event.akadTime : event.resepsiTime}\nLokasi: ${event.locationName}\nAlamat: ${event.address}\nGoogle Maps: ${event.gmapsUrl}`;
     const location = `${event.locationName}, ${event.address}`;
 
@@ -63,8 +85,7 @@ export default function EventSection() {
     const title = isAkad
       ? `Akad Nikah ${couple.groom.nickname} & ${couple.bride.nickname}`
       : `Resepsi Pernikahan ${couple.groom.nickname} & ${couple.bride.nickname}`;
-    const start = isAkad ? '20270620T010000Z' : '20270620T040000Z';
-    const end = isAkad ? '20270620T030000Z' : '20270620T100000Z';
+    const { start, end } = getCalendarIsoDates(event.date, isAkad);
     const description = `${title} - Pukul ${isAkad ? event.akadTime : event.resepsiTime} WIB. Lokasi: ${event.locationName}, ${event.address}`;
     const location = `${event.locationName}, ${event.address}`;
 
